@@ -17,9 +17,7 @@ export default function ProgressOverview() {
         <div className="flex flex-col space-y-1">
           <h3 className="text-sm text-muted-foreground">Current Streak</h3>
 
-          <p className="text-lg font-semibold leading-none tracking-tight">
-            23 days
-          </p>
+          <p className="font-semibold leading-none tracking-tight">23 days</p>
         </div>
       </div>
     </div>
