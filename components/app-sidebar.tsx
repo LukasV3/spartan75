@@ -26,8 +26,8 @@ import { AppLogo } from "./app-logo";
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "lukasvolk",
+    email: "lukas@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
