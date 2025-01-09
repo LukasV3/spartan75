@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const tasks = [
   {
@@ -31,13 +32,16 @@ const tasks = [
 type DailyTasksChecklistProps = {
   incrementStreak: () => void;
   decrementStreak: () => void;
+  currentDayIndex: number;
 };
 
 export default function DailyTasksChecklist({
   incrementStreak,
   decrementStreak,
+  currentDayIndex,
 }: DailyTasksChecklistProps) {
   const [numCompletedTasks, setNumCompletedTasks] = useState(0);
+  const { toast } = useToast();
 
   const numberOfTasks = tasks.length;
   const percentageComplete = (numCompletedTasks / numberOfTasks) * 100;
@@ -64,6 +68,10 @@ export default function DailyTasksChecklist({
       // if on next render all tasks will be complete
       if (numCompletedTasks + 1 === numberOfTasks) {
         incrementStreak();
+        toast({
+          title: "Wooooooo! 🥳",
+          description: `You completed day ${currentDayIndex}. ${75 - currentDayIndex} to go.`,
+        });
       }
     }
   };

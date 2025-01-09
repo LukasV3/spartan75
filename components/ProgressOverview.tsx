@@ -6,16 +6,17 @@ import { type DateRange } from "react-day-picker";
 
 export default function ProgressOverview({
   currentStreak,
+  currentDayIndex,
 }: {
   currentStreak: number;
+  currentDayIndex: number;
 }) {
-  const currentDayOfChallenge = 1;
   const selectedDates: DateRange = {
     from: new Date(
-      new Date().setDate(new Date().getDate() - (currentDayOfChallenge - 1)),
+      new Date().setDate(new Date().getDate() - (currentDayIndex - 1))
     ),
     to:
-      currentStreak === currentDayOfChallenge
+      currentStreak === currentDayIndex
         ? new Date()
         : currentStreak
           ? new Date(new Date().setDate(new Date().getDate() - 1))
@@ -30,7 +31,7 @@ export default function ProgressOverview({
         </h3>
 
         <p className="text-sm text-muted-foreground">
-          Day {currentDayOfChallenge} of 75
+          Day {currentDayIndex} of 75
         </p>
       </div>
 

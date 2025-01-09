@@ -20,6 +20,7 @@ import ProgressOverview from "@/components/ProgressOverview";
 
 export default function Page() {
   const [currentStreak, setCurrentStreak] = useState(0);
+  const currentDayIndex = 1;
 
   return (
     <SidebarProvider>
@@ -47,9 +48,13 @@ export default function Page() {
             <DailyTasksChecklist
               incrementStreak={() => setCurrentStreak((a) => a + 1)}
               decrementStreak={() => setCurrentStreak((a) => a - 1)}
+              currentDayIndex={currentDayIndex}
             />
 
-            <ProgressOverview currentStreak={currentStreak} />
+            <ProgressOverview
+              currentStreak={currentStreak}
+              currentDayIndex={currentDayIndex}
+            />
           </div>
         </div>
       </SidebarInset>
