@@ -24,10 +24,11 @@ export default function ProgressOverview({
   };
 
   return (
-    <div className="h-min rounded-xl bg-muted/50">
-      <div className="flex flex-col space-y-1.5 p-6">
-        <h3 className="font-semibold leading-none tracking-tight">
+    <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
+      <div className="flex flex-col space-y-1.5">
+        <h3 className="text-2xl font-semibold tracking-tight">
           Progress Overview
+          <span className="ml-2">🎯</span>
         </h3>
 
         <p className="text-sm text-muted-foreground">
@@ -35,19 +36,22 @@ export default function ProgressOverview({
         </p>
       </div>
 
-      <div className="flex items-center gap-2 p-6 pt-0">
-        <div className="text-5xl">🔥</div>
+      <hr />
 
-        <div className="flex flex-col space-y-1">
-          <h3 className="text-sm text-muted-foreground">Current Streak</h3>
+      <div className="flex flex-col space-y-2">
+        <h3 className="text-sm text-muted-foreground">Current streak:</h3>
 
-          <p className="font-semibold leading-none tracking-tight">
-            {currentStreak} {currentStreak === 1 ? "day" : "days"}
-          </p>
-        </div>
+        <p className="text-lg font-semibold leading-none tracking-tight">
+          {currentStreak} {currentStreak === 1 ? "day" : "days"}
+          {currentStreak > 0 && <span className="ml-1">🔥</span>}
+        </p>
       </div>
 
-      <div className="p-6 pt-0">
+      <hr />
+
+      <div className="flex flex-col space-y-2">
+        <h3 className="text-sm text-muted-foreground">Calendar view:</h3>
+
         <Calendar
           mode="range"
           selected={currentStreak && selectedDates}

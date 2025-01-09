@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const tasks = [
   {
@@ -46,8 +47,8 @@ export default function DailyTasksChecklist({
   const numberOfTasks = tasks.length;
   const percentageComplete = (numCompletedTasks / numberOfTasks) * 100;
   const formattedTodaysDate = new Date().toLocaleDateString("en-gb", {
-    year: "numeric",
-    month: "long",
+    weekday: "long",
+    month: "short",
     day: "numeric",
   });
 
@@ -77,10 +78,11 @@ export default function DailyTasksChecklist({
   };
 
   return (
-    <div className="rounded-xl bg-muted/50">
-      <div className="flex flex-col space-y-1.5 p-6">
-        <h3 className="font-semibold leading-none tracking-tight">
+    <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
+      <div className="flex flex-col space-y-1.5">
+        <h3 className="text-2xl font-semibold tracking-tight">
           Daily Tasks Checklist
+          <span className="ml-2">📋</span>
         </h3>
 
         <p className="text-sm text-muted-foreground">
@@ -88,15 +90,35 @@ export default function DailyTasksChecklist({
         </p>
       </div>
 
-      <div className="p-6 pt-0 flex flex-col space-y-4">
-        <h3 className="font-semibold leading-none tracking-tight">
-          {formattedTodaysDate}
-        </h3>
+      <hr />
+
+      {/* Date heading */}
+      <div className="flex flex-col space-y-4">
+        <div className="text-lg font-semibold tracking-tight flex items-center gap-x-2">
+          <p>{formattedTodaysDate.split(" ").slice(1).join(" ")}</p>
+
+          <span className="text-xs">●</span>
+
+          <p>Today</p>
+
+          <span className="text-xs">●</span>
+
+          <p>{formattedTodaysDate.split(" ")[0]}</p>
+        </div>
 
         {/* Progress Bar */}
-        <div className="flex items-center gap-x-2">
-          <p>{`${percentageComplete}%`}</p>
+        <div className="flex items-center gap-x-2 pb-1.5">
+          <h3 className="text-sm text-muted-foreground shrink-0">
+            Todays progress:
+          </h3>
+
           <Progress value={percentageComplete} />
+
+          <p
+            className={cn("text-sm text-muted-foreground shrink-0", {
+              "text-foreground": percentageComplete === 100,
+            })}
+          >{`${percentageComplete}%`}</p>
         </div>
 
         {/* Task List */}
