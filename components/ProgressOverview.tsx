@@ -4,11 +4,15 @@ import React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { type DateRange } from "react-day-picker";
 
-const streak = 0;
-
-export default function ProgressOverview() {
+export default function ProgressOverview({
+  currentStreak,
+}: {
+  currentStreak: number;
+}) {
   const selectedDates: DateRange = {
-    from: new Date(new Date().setDate(new Date().getDate() - streak)),
+    from: new Date(
+      new Date().setDate(new Date().getDate() - (currentStreak - 1))
+    ),
     to: new Date(),
   };
 
@@ -19,7 +23,9 @@ export default function ProgressOverview() {
           Progress Overview
         </h3>
 
-        <p className="text-sm text-muted-foreground">Day {streak} of 75</p>
+        <p className="text-sm text-muted-foreground">
+          Day {currentStreak} of 75
+        </p>
       </div>
 
       <div className="flex items-center gap-2 p-6 pt-0">
@@ -29,7 +35,7 @@ export default function ProgressOverview() {
           <h3 className="text-sm text-muted-foreground">Current Streak</h3>
 
           <p className="font-semibold leading-none tracking-tight">
-            {streak} days
+            {currentStreak} days
           </p>
         </div>
       </div>
@@ -37,7 +43,7 @@ export default function ProgressOverview() {
       <div className="p-6 pt-0">
         <Calendar
           mode="range"
-          selected={selectedDates}
+          selected={currentStreak ? selectedDates : null}
           className="rounded-md border w-min"
         />
       </div>

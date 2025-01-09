@@ -28,19 +28,44 @@ const tasks = [
   },
 ];
 
-export default function DailyTasksChecklist() {
+type DailyTasksChecklistProps = {
+  incrementStreak: () => void;
+  decrementStreak: () => void;
+};
+
+export default function DailyTasksChecklist({
+  incrementStreak,
+  decrementStreak,
+}: DailyTasksChecklistProps) {
   const [numCompletedTasks, setNumCompletedTasks] = useState(0);
 
-  const percentComplete = (numCompletedTasks / 5) * 100;
-  const formattedDate = new Date().toLocaleDateString("en-gb", {
+  const numberOfTasks = tasks.length;
+  const percentageComplete = (numCompletedTasks / numberOfTasks) * 100;
+  const formattedTodaysDate = new Date().toLocaleDateString("en-gb", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
-  const onCompleteTask = (e: React.FormEvent<HTMLButtonElement>) => {
+  const onTaskClick = (e: React.FormEvent<HTMLButtonElement>) => {
     const checked = (e.target as HTMLElement).getAttribute("aria-checked");
-    setNumCompletedTasks((prev) => (checked === "true" ? prev - 1 : prev + 1));
+
+    if (checked === "true") {
+      // task is being unchecked
+      setNumCompletedTasks((a) => a - 1);
+
+      if (percentageComplete === 100) {
+        decrementStreak();
+      }
+    } else {
+      // task is being checked
+      setNumCompletedTasks((a) => a + 1);
+
+      // if on next render all tasks will be complete
+      if (numCompletedTasks + 1 === numberOfTasks) {
+        incrementStreak();
+      }
+    }
   };
 
   return (
@@ -57,26 +82,26 @@ export default function DailyTasksChecklist() {
 
       <div className="p-6 pt-0 flex flex-col space-y-4">
         <h3 className="font-semibold leading-none tracking-tight">
-          {formattedDate}
+          {formattedTodaysDate}
         </h3>
 
         {/* Progress Bar */}
         <div className="flex items-center gap-x-2">
-          {`${percentComplete}%`}
-          <Progress value={percentComplete} />
+          <p>{`${percentageComplete}%`}</p>
+          <Progress value={percentageComplete} />
         </div>
 
         {/* Task List */}
-        <div id="tasksList" className="flex flex-col space-y-4">
+        <ul className="flex flex-col space-y-4">
           {tasks.map((task) => (
             <TaskItem
               key={task.id}
               task={task.value}
               id={task.id}
-              onCompleteTask={onCompleteTask}
+              onTaskClick={onTaskClick}
             />
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   );
@@ -85,18 +110,18 @@ export default function DailyTasksChecklist() {
 const TaskItem = ({
   task,
   id,
-  onCompleteTask,
+  onTaskClick,
 }: {
   task: string;
   id: number;
-  onCompleteTask: (e: React.FormEvent<HTMLButtonElement>) => void;
+  onTaskClick: (e: React.FormEvent<HTMLButtonElement>) => void;
 }) => {
   return (
-    <div className="flex items-center space-x-2">
-      <Checkbox id={`checkbox-${id}`} onClick={onCompleteTask} />
+    <li className="flex items-center space-x-2">
+      <Checkbox id={`checkbox-${id}`} onClick={onTaskClick} />
       <Label htmlFor={`checkbox-${id}`} className="leading-none cursor-pointer">
         {task}
       </Label>
-    </div>
+    </li>
   );
 };

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -16,6 +19,8 @@ import DailyTasksChecklist from "@/components/DailyTasksChecklist";
 import ProgressOverview from "@/components/ProgressOverview";
 
 export default function Page() {
+  const [currentStreak, setCurrentStreak] = useState(0);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -39,9 +44,12 @@ export default function Page() {
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="grid auto-rows-min gap-4 md:grid-cols-[1fr,_33%]">
-            <DailyTasksChecklist />
+            <DailyTasksChecklist
+              incrementStreak={() => setCurrentStreak((a) => a + 1)}
+              decrementStreak={() => setCurrentStreak((a) => a - 1)}
+            />
 
-            <ProgressOverview />
+            <ProgressOverview currentStreak={currentStreak} />
           </div>
         </div>
       </SidebarInset>
