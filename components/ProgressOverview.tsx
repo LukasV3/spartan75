@@ -9,11 +9,17 @@ export default function ProgressOverview({
 }: {
   currentStreak: number;
 }) {
+  const currentDayOfChallenge = 1;
   const selectedDates: DateRange = {
     from: new Date(
-      new Date().setDate(new Date().getDate() - (currentStreak - 1))
+      new Date().setDate(new Date().getDate() - (currentDayOfChallenge - 1))
     ),
-    to: new Date(),
+    to:
+      currentStreak === currentDayOfChallenge
+        ? new Date()
+        : currentStreak
+          ? new Date(new Date().setDate(new Date().getDate() - 1))
+          : undefined,
   };
 
   return (
@@ -24,7 +30,7 @@ export default function ProgressOverview({
         </h3>
 
         <p className="text-sm text-muted-foreground">
-          Day {currentStreak} of 75
+          Day {currentDayOfChallenge} of 75
         </p>
       </div>
 
@@ -35,7 +41,7 @@ export default function ProgressOverview({
           <h3 className="text-sm text-muted-foreground">Current Streak</h3>
 
           <p className="font-semibold leading-none tracking-tight">
-            {currentStreak} days
+            {currentStreak} {currentStreak === 1 ? "day" : "days"}
           </p>
         </div>
       </div>
@@ -43,7 +49,7 @@ export default function ProgressOverview({
       <div className="p-6 pt-0">
         <Calendar
           mode="range"
-          selected={currentStreak ? selectedDates : null}
+          selected={currentStreak && selectedDates}
           className="rounded-md border w-min"
         />
       </div>
