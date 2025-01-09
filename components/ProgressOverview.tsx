@@ -12,7 +12,7 @@ export default function ProgressOverview({
   const currentDayOfChallenge = 1;
   const selectedDates: DateRange = {
     from: new Date(
-      new Date().setDate(new Date().getDate() - (currentDayOfChallenge - 1))
+      new Date().setDate(new Date().getDate() - (currentDayOfChallenge - 1)),
     ),
     to:
       currentStreak === currentDayOfChallenge
