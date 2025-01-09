@@ -4,7 +4,7 @@ import React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { type DateRange } from "react-day-picker";
 
-const streak = 23;
+const streak = 0;
 
 export default function ProgressOverview() {
   const selectedDates: DateRange = {
