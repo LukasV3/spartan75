@@ -122,7 +122,7 @@ export default function DailyTasksChecklist({
         </div>
 
         {/* Task List */}
-        <ul className="flex flex-col space-y-4">
+        <ul className="flex flex-col">
           {tasks.map((task) => (
             <TaskItem
               key={task.id}
@@ -147,10 +147,17 @@ const TaskItem = ({
   onTaskClick: (e: React.FormEvent<HTMLButtonElement>) => void;
 }) => {
   return (
-    <li className="flex items-center space-x-2">
-      <Checkbox id={`checkbox-${id}`} onClick={onTaskClick} />
-      <Label htmlFor={`checkbox-${id}`} className="leading-none cursor-pointer">
-        {task}
+    <li className="first:border-t border-b">
+      <Label
+        htmlFor={`checkbox-${id}`}
+        className="flex items-center space-x-2.5 cursor-pointer py-4"
+      >
+        <Checkbox
+          id={`checkbox-${id}`}
+          onClick={onTaskClick}
+          className="rounded-full w-5 h-5 transition-colors hover:bg-muted"
+        />
+        <p className="leading-none">{task}</p>
       </Label>
     </li>
   );
