@@ -13,7 +13,7 @@ export default function ProgressOverview({
 }) {
   const selectedDates: DateRange = {
     from: new Date(
-      new Date().setDate(new Date().getDate() - (currentDayIndex - 1))
+      new Date().setDate(new Date().getDate() - (currentDayIndex - 1)),
     ),
     to:
       currentStreak === currentDayIndex
