@@ -14,6 +14,7 @@ import {
 // import { NavMain } from "@/components/nav-main";
 // import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
+import { NavCreateUser } from "@/components/nav-create-user";
 import {
   Sidebar,
   SidebarContent,
@@ -139,8 +140,9 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
+      {/* Todo: remove && false */}
       <SidebarHeader>
-        <NavUser user={data.user} />
+        {data.user && false ? <NavUser user={data.user} /> : <NavCreateUser />}
       </SidebarHeader>
 
       <SidebarContent>

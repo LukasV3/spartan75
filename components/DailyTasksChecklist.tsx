@@ -7,6 +7,17 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 const tasks = [
   {
     value: "Follow a Diet",
@@ -42,6 +53,7 @@ export default function DailyTasksChecklist({
   currentDayIndex,
 }: DailyTasksChecklistProps) {
   const [numCompletedTasks, setNumCompletedTasks] = useState(0);
+  const [alertOpen, setAlertOpen] = useState(false);
   const { toast, dismiss } = useToast();
 
   const numberOfTasks = tasks.length;
@@ -66,6 +78,11 @@ export default function DailyTasksChecklist({
     } else {
       // task is being checked
       setNumCompletedTasks((a) => a + 1);
+
+      // on 2nd checked item ask if user wants to create an account to save progress
+      if (numCompletedTasks + 4 === numberOfTasks) {
+        setAlertOpen(true);
+      }
 
       // if on next render all tasks will be complete
       if (numCompletedTasks + 1 === numberOfTasks) {
@@ -134,6 +151,28 @@ export default function DailyTasksChecklist({
           ))}
         </ul>
       </div>
+
+      <AlertDialog open={alertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Do you want to save your progress?
+            </AlertDialogTitle>
+
+            <AlertDialogDescription>
+              Your progress won't be saved unless you create a free account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAlertOpen(false)}>
+              No
+              {/* if no - add red notification in sidebar */}
+            </AlertDialogCancel>
+            <AlertDialogAction>Yes</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
