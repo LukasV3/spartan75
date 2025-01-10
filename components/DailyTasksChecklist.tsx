@@ -6,17 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import SignupAlert from "@/components/SignupAlert";
 
 const tasks = [
   {
@@ -96,84 +86,66 @@ export default function DailyTasksChecklist({
   };
 
   return (
-    <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
-      <div className="flex flex-col space-y-1.5">
-        <h3 className="text-2xl font-semibold tracking-tight">
-          Daily Tasks Checklist
-          <span className="ml-2">📋</span>
-        </h3>
+    <>
+      <SignupAlert open={alertOpen} onAlertClose={() => setAlertOpen(false)} />
 
-        <p className="text-sm text-muted-foreground">
-          This is your tasks checklist
-        </p>
-      </div>
-
-      <hr />
-
-      {/* Date heading */}
-      <div className="flex flex-col space-y-4">
-        <div className="text-lg font-semibold tracking-tight flex items-center gap-x-2">
-          <p>{formattedTodaysDate.split(" ").slice(1).join(" ")}</p>
-
-          <span className="text-xs">●</span>
-
-          <p>Today</p>
-
-          <span className="text-xs">●</span>
-
-          <p>{formattedTodaysDate.split(" ")[0]}</p>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="flex items-center gap-x-2 pb-1.5">
-          <h3 className="text-sm text-muted-foreground shrink-0">
-            Todays progress:
+      <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
+        <div className="flex flex-col space-y-1.5">
+          <h3 className="text-2xl font-semibold tracking-tight">
+            Daily Tasks Checklist
+            <span className="ml-2">📋</span>
           </h3>
 
-          <Progress value={percentageComplete} />
-
-          <p
-            className={cn("text-sm text-muted-foreground shrink-0", {
-              "text-foreground": percentageComplete === 100,
-            })}
-          >{`${percentageComplete}%`}</p>
+          <p className="text-sm text-muted-foreground">
+            This is your tasks checklist
+          </p>
         </div>
 
-        {/* Task List */}
-        <ul className="flex flex-col">
-          {tasks.map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task.value}
-              id={task.id}
-              onTaskClick={onTaskClick}
-            />
-          ))}
-        </ul>
+        <hr />
+
+        {/* Date heading */}
+        <div className="flex flex-col space-y-4">
+          <div className="text-lg font-semibold tracking-tight flex items-center gap-x-2">
+            <p>{formattedTodaysDate.split(" ").slice(1).join(" ")}</p>
+
+            <span className="text-xs">●</span>
+
+            <p>Today</p>
+
+            <span className="text-xs">●</span>
+
+            <p>{formattedTodaysDate.split(" ")[0]}</p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="flex items-center gap-x-2 pb-1.5">
+            <h3 className="text-sm text-muted-foreground shrink-0">
+              Todays progress:
+            </h3>
+
+            <Progress value={percentageComplete} />
+
+            <p
+              className={cn("text-sm text-muted-foreground shrink-0", {
+                "text-foreground": percentageComplete === 100,
+              })}
+            >{`${percentageComplete}%`}</p>
+          </div>
+
+          {/* Task List */}
+          <ul className="flex flex-col">
+            {tasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task.value}
+                id={task.id}
+                onTaskClick={onTaskClick}
+              />
+            ))}
+          </ul>
+        </div>
       </div>
-
-      <AlertDialog open={alertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Do you want to save your progress?
-            </AlertDialogTitle>
-
-            <AlertDialogDescription>
-              Your progress won't be saved unless you create a free account.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setAlertOpen(false)}>
-              No
-              {/* if no - add red notification in sidebar */}
-            </AlertDialogCancel>
-            <AlertDialogAction>Yes</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+    </>
   );
 }
 
