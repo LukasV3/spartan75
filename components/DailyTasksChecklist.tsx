@@ -42,7 +42,7 @@ export default function DailyTasksChecklist({
   currentDayIndex,
 }: DailyTasksChecklistProps) {
   const [numCompletedTasks, setNumCompletedTasks] = useState(0);
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
 
   const numberOfTasks = tasks.length;
   const percentageComplete = (numCompletedTasks / numberOfTasks) * 100;
@@ -61,6 +61,7 @@ export default function DailyTasksChecklist({
 
       if (percentageComplete === 100) {
         decrementStreak();
+        dismiss(); // hide toast
       }
     } else {
       // task is being checked
@@ -157,7 +158,9 @@ const TaskItem = ({
           onClick={onTaskClick}
           className="rounded-full w-5 h-5 transition-colors hover:bg-muted"
         />
-        <p className="leading-none">{task}</p>
+        <p className="leading-none peer-data-[state=checked]:line-through">
+          {task}
+        </p>
       </Label>
     </li>
   );
