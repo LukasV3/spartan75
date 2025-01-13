@@ -12,7 +12,7 @@ export default function Page() {
 
   return (
     <Dialog defaultOpen={true} onOpenChange={() => router.push("/")}>
-      <DialogContent>
+      <DialogContent className="w-min p-0 !rounded-[0.75rem]">
         {/* to ensure accessibility for screen reader users a dialog title is needed. */}
         <VisuallyHidden asChild>
           <DialogTitle>Sign Up</DialogTitle>
