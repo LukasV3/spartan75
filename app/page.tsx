@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -14,12 +11,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import DailyTasksChecklist from "@/components/DailyTasksChecklist";
-import ProgressOverview from "@/components/ProgressOverview";
+import AppMain from "@/components/AppMain";
+import { auth } from "@clerk/nextjs/server";
 
-export default function Page() {
-  const [currentStreak, setCurrentStreak] = useState(0);
-  const currentDayIndex = 1;
+export default async function Page() {
+  const { userId, redirectToSignIn } = await auth();
+
+  if (!userId) return redirectToSignIn();
 
   return (
     <SidebarProvider>
@@ -42,20 +40,7 @@ export default function Page() {
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 container mx-auto">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-[1fr,_min-content]">
-            <DailyTasksChecklist
-              incrementStreak={() => setCurrentStreak((a) => a + 1)}
-              decrementStreak={() => setCurrentStreak((a) => a - 1)}
-              currentDayIndex={currentDayIndex}
-            />
-
-            <ProgressOverview
-              currentStreak={currentStreak}
-              currentDayIndex={currentDayIndex}
-            />
-          </div>
-        </div>
+        <AppMain />
       </SidebarInset>
     </SidebarProvider>
   );

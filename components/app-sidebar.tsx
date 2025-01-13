@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import {
   BookOpen,
@@ -23,6 +21,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { AppLogo } from "./app-logo";
+import { currentUser } from "@clerk/nextjs/server";
 
 // This is sample data.
 const data = {
@@ -137,12 +136,22 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export async function AppSidebar() {
+  const user = await currentUser();
+
+  // TODO: Handle if user is not signed in
+  if (!user) return <div>No user :(</div>;
+
+  const formattedUser = {
+    username: user.username,
+    email: user.emailAddresses[0].emailAddress,
+    avatar: user.imageUrl,
+  };
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      {/* Todo: remove && false */}
+    <Sidebar collapsible="icon">
       <SidebarHeader>
-        {data.user && false ? <NavUser user={data.user} /> : <NavCreateUser />}
+        {user ? <NavUser user={formattedUser} /> : <NavCreateUser />}
       </SidebarHeader>
 
       <SidebarContent>

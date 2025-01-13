@@ -21,7 +21,8 @@ export default function Page() {
         <SignIn />
       </DialogContent>
 
-      <App />
+      {/* TODO: display app in background */}
+      {/* <App /> */}
     </Dialog>
   );
 }
