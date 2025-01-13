@@ -6,7 +6,6 @@ import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import SignupAlert from "@/components/SignupAlert";
 
 const tasks = [
   {
@@ -43,7 +42,6 @@ export default function DailyTasksChecklist({
   currentDayIndex,
 }: DailyTasksChecklistProps) {
   const [numCompletedTasks, setNumCompletedTasks] = useState(0);
-  const [alertOpen, setAlertOpen] = useState(false);
   const { toast, dismiss } = useToast();
 
   const numberOfTasks = tasks.length;
@@ -69,11 +67,6 @@ export default function DailyTasksChecklist({
       // task is being checked
       setNumCompletedTasks((a) => a + 1);
 
-      // on 2nd checked item ask if user wants to create an account to save progress
-      if (numCompletedTasks + 4 === numberOfTasks) {
-        setAlertOpen(true);
-      }
-
       // if on next render all tasks will be complete
       if (numCompletedTasks + 1 === numberOfTasks) {
         incrementStreak();
@@ -86,66 +79,62 @@ export default function DailyTasksChecklist({
   };
 
   return (
-    <>
-      <SignupAlert open={alertOpen} onAlertClose={() => setAlertOpen(false)} />
+    <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
+      <div className="flex flex-col space-y-1.5">
+        <h3 className="text-2xl font-semibold tracking-tight">
+          Daily Tasks Checklist
+          <span className="ml-2">📋</span>
+        </h3>
 
-      <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
-        <div className="flex flex-col space-y-1.5">
-          <h3 className="text-2xl font-semibold tracking-tight">
-            Daily Tasks Checklist
-            <span className="ml-2">📋</span>
+        <p className="text-sm text-muted-foreground">
+          This is your tasks checklist
+        </p>
+      </div>
+
+      <hr />
+
+      {/* Date heading */}
+      <div className="flex flex-col space-y-4">
+        <div className="text-lg font-semibold tracking-tight flex items-center gap-x-2">
+          <p>{formattedTodaysDate.split(" ").slice(1).join(" ")}</p>
+
+          <span className="text-xs">●</span>
+
+          <p>Today</p>
+
+          <span className="text-xs">●</span>
+
+          <p>{formattedTodaysDate.split(" ")[0]}</p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="flex items-center gap-x-2 pb-1.5">
+          <h3 className="text-sm text-muted-foreground shrink-0">
+            Todays progress:
           </h3>
 
-          <p className="text-sm text-muted-foreground">
-            This is your tasks checklist
-          </p>
+          <Progress value={percentageComplete} />
+
+          <p
+            className={cn("text-sm text-muted-foreground shrink-0", {
+              "text-foreground": percentageComplete === 100,
+            })}
+          >{`${percentageComplete}%`}</p>
         </div>
 
-        <hr />
-
-        {/* Date heading */}
-        <div className="flex flex-col space-y-4">
-          <div className="text-lg font-semibold tracking-tight flex items-center gap-x-2">
-            <p>{formattedTodaysDate.split(" ").slice(1).join(" ")}</p>
-
-            <span className="text-xs">●</span>
-
-            <p>Today</p>
-
-            <span className="text-xs">●</span>
-
-            <p>{formattedTodaysDate.split(" ")[0]}</p>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="flex items-center gap-x-2 pb-1.5">
-            <h3 className="text-sm text-muted-foreground shrink-0">
-              Todays progress:
-            </h3>
-
-            <Progress value={percentageComplete} />
-
-            <p
-              className={cn("text-sm text-muted-foreground shrink-0", {
-                "text-foreground": percentageComplete === 100,
-              })}
-            >{`${percentageComplete}%`}</p>
-          </div>
-
-          {/* Task List */}
-          <ul className="flex flex-col">
-            {tasks.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task.value}
-                id={task.id}
-                onTaskClick={onTaskClick}
-              />
-            ))}
-          </ul>
-        </div>
+        {/* Task List */}
+        <ul className="flex flex-col">
+          {tasks.map((task) => (
+            <TaskItem
+              key={task.id}
+              task={task.value}
+              id={task.id}
+              onTaskClick={onTaskClick}
+            />
+          ))}
+        </ul>
       </div>
-    </>
+    </div>
   );
 }
 
