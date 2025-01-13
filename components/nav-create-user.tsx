@@ -16,14 +16,16 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "./ui/button";
 import { SignupForm } from "@/components/signup-form";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export function NavCreateUser() {
   const { isMobile, open } = useSidebar();
 
   return (
     <Dialog>
-      <SignupForm />
+      <DialogContent>
+        <SignupForm />
+      </DialogContent>
 
       <SidebarMenu>
         <SidebarMenuItem>

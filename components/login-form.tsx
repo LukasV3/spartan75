@@ -8,20 +8,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-type SignupFormProps = {
+type LoginFormProps = {
   onToggleFormClick?: () => void;
 };
 
-export function SignupForm({ onToggleFormClick }: SignupFormProps) {
+export function LoginForm({ onToggleFormClick }: LoginFormProps) {
   return (
     <>
       <Card className="border-0 shadow-none">
         <DialogHeader>
           <CardHeader>
-            <DialogTitle className="text-2xl">Signup</DialogTitle>
+            <DialogTitle className="text-2xl">Login</DialogTitle>
 
             <DialogDescription>
-              Enter your email below to create your account
+              Enter your email below to login to your account
             </DialogDescription>
           </CardHeader>
         </DialogHeader>
@@ -40,26 +40,34 @@ export function SignupForm({ onToggleFormClick }: SignupFormProps) {
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                  <a
+                    href="#"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  >
+                    Forgot your password?
+                  </a>
+                </div>
                 <Input id="password" type="password" required />
               </div>
 
               <Button type="submit" className="w-full">
-                Signup
+                Login
               </Button>
 
               <Button variant="outline" className="w-full">
-                Signup with Google
+                Login with Google
               </Button>
             </div>
 
             <div className="mt-4 text-center text-sm">
-              Have an account?{" "}
+              Don&apos;t have an account?{" "}
               <span
                 onClick={onToggleFormClick}
                 className="underline underline-offset-4"
               >
-                Login
+                Sign up
               </span>
             </div>
           </form>

@@ -8,7 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Dialog, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { SignupForm } from "./signup-form";
 
 export default function SignupAlert({
@@ -20,7 +20,9 @@ export default function SignupAlert({
 }) {
   return (
     <Dialog>
-      <SignupForm />
+      <DialogContent>
+        <SignupForm />
+      </DialogContent>
 
       <AlertDialog open={open}>
         <AlertDialogContent>
