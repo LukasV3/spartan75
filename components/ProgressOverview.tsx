@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Calendar } from "@/components/ui/calendar";
-import { type DateRange } from "react-day-picker";
 
 export default function ProgressOverview({
   currentStreak,
@@ -11,17 +10,19 @@ export default function ProgressOverview({
   currentStreak: number;
   currentDayIndex: number;
 }) {
-  const selectedDates: DateRange = {
-    from: new Date(
-      new Date().setDate(new Date().getDate() - (currentDayIndex - 1)),
-    ),
-    to:
-      currentStreak === currentDayIndex
-        ? new Date()
-        : currentStreak
-          ? new Date(new Date().setDate(new Date().getDate() - 1))
-          : undefined,
-  };
+  const selectedDates = currentStreak
+    ? {
+        from: new Date(
+          new Date().setDate(new Date().getDate() - (currentDayIndex - 1))
+        ),
+        to:
+          currentStreak === currentDayIndex
+            ? new Date()
+            : currentStreak
+              ? new Date(new Date().setDate(new Date().getDate() - 1))
+              : undefined,
+      }
+    : undefined;
 
   return (
     <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
@@ -54,7 +55,7 @@ export default function ProgressOverview({
 
         <Calendar
           mode="range"
-          selected={currentStreak && selectedDates}
+          selected={selectedDates}
           className="rounded-md border w-min"
         />
       </div>
