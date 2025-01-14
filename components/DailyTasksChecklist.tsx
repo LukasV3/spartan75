@@ -102,9 +102,9 @@ export default function DailyTasksChecklist({
         <ul className="flex flex-col">
           {tasks.map((task) => (
             <TaskItem
-              key={task.taskId}
+              key={task.id}
               task={task.name}
-              id={task.taskId}
+              id={task.id}
               onTaskClick={onTaskClick}
             />
           ))}

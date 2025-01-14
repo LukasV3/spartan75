@@ -121,12 +121,12 @@ export type User = {
 
 export const TasksSchema = z.array(
   z.object({
-    task_id: z.number(),
+    id: z.number(),
     name: z.string(),
   })
 );
 
 export type Task = {
-  taskId: number;
+  id: number;
   name: string;
 };

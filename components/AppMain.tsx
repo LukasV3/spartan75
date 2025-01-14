@@ -19,7 +19,7 @@ export default async function AppMain() {
   const { data: parsedTasks } = parseResult;
 
   const formattedTasks: Task[] = parsedTasks.map((task) => ({
-    taskId: task.task_id,
+    id: task.id,
     name: task.name,
   }));
 
