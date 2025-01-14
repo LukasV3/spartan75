@@ -1,12 +1,11 @@
 "use client";
 
-import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -73,7 +72,7 @@ export function NavUser({ user }: { user: User }) {
               </div>
             </DropdownMenuLabel>
 
-            {/* TODO: Implement account settings
+            {/* TODO: Implement account settings using clerk UI components
             <DropdownMenuSeparator />
 
              <DropdownMenuGroup>

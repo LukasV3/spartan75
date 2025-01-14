@@ -4,7 +4,6 @@ import React from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { SignIn } from "@clerk/nextjs";
-import App from "@/app/page";
 import { useRouter } from "next/navigation";
 
 export default function Page() {

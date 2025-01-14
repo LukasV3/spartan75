@@ -56,7 +56,7 @@ export function NavCreateUser() {
                     </span>
                   )}
                   <span className="text-xs">
-                    Your progress won't be saved unless you create a free
+                    Your progress won&apos;t be saved unless you create a free
                     account.
                   </span>
                 </div>
