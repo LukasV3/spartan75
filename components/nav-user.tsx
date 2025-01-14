@@ -19,6 +19,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { type User } from "@/lib/definitions";
+import { SignOutButton } from "@clerk/nextjs";
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
@@ -72,21 +73,24 @@ export function NavUser({ user }: { user: User }) {
               </div>
             </DropdownMenuLabel>
 
+            {/* TODO: Implement account settings
             <DropdownMenuSeparator />
 
-            <DropdownMenuGroup>
+             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
-            </DropdownMenuGroup>
+            </DropdownMenuGroup> */}
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
+            <SignOutButton>
+              <DropdownMenuItem className="cursor-pointer">
+                <LogOut />
+                Log out
+              </DropdownMenuItem>
+            </SignOutButton>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
