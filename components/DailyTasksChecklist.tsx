@@ -6,39 +6,15 @@ import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-
-const tasks = [
-  {
-    value: "Follow a Diet",
-    id: 1,
-  },
-  {
-    value: "Complete Two 45-Minute Workouts",
-    id: 2,
-  },
-  {
-    value: "Drink 1 Gallon of Water",
-    id: 3,
-  },
-  {
-    value: "Read 10 Pages of a Non-Fiction Book",
-    id: 4,
-  },
-  {
-    value: "Take a Progress Photo",
-    id: 5,
-  },
-];
+import { type Task } from "@/lib/definitions";
 
 type DailyTasksChecklistProps = {
-  incrementStreak: () => void;
-  decrementStreak: () => void;
+  tasks: Task[];
   currentDayIndex: number;
 };
 
 export default function DailyTasksChecklist({
-  incrementStreak,
-  decrementStreak,
+  tasks,
   currentDayIndex,
 }: DailyTasksChecklistProps) {
   const [numCompletedTasks, setNumCompletedTasks] = useState(0);
@@ -60,7 +36,7 @@ export default function DailyTasksChecklist({
       setNumCompletedTasks((a) => a - 1);
 
       if (percentageComplete === 100) {
-        decrementStreak();
+        // decrementStreak();
         dismiss(); // hide toast
       }
     } else {
@@ -69,7 +45,7 @@ export default function DailyTasksChecklist({
 
       // if on next render all tasks will be complete
       if (numCompletedTasks + 1 === numberOfTasks) {
-        incrementStreak();
+        // incrementStreak();
         toast({
           title: "Wooooooo! 🥳",
           description: `You completed day ${currentDayIndex}. ${75 - currentDayIndex} to go.`,
@@ -126,9 +102,9 @@ export default function DailyTasksChecklist({
         <ul className="flex flex-col">
           {tasks.map((task) => (
             <TaskItem
-              key={task.id}
-              task={task.value}
-              id={task.id}
+              key={task.taskId}
+              task={task.name}
+              id={task.taskId}
               onTaskClick={onTaskClick}
             />
           ))}

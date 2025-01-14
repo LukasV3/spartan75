@@ -118,3 +118,15 @@ export type User = {
   email: string;
   avatar: string;
 };
+
+export const TasksSchema = z.array(
+  z.object({
+    task_id: z.number(),
+    name: z.string(),
+  })
+);
+
+export type Task = {
+  taskId: number;
+  name: string;
+};
