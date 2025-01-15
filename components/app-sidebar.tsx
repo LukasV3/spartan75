@@ -28,12 +28,16 @@ export async function AppSidebar() {
     return;
   }
 
-  const { data: parsedUser } = parseResult;
+  const {
+    username,
+    emailAddresses: [{ emailAddress }],
+    imageUrl,
+  } = parseResult.data;
 
   const formattedUser = {
-    username: parsedUser.username,
-    email: parsedUser.emailAddresses[0].emailAddress,
-    avatar: parsedUser.imageUrl,
+    username,
+    email: emailAddress,
+    avatar: imageUrl,
   };
 
   return (
