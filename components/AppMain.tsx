@@ -10,24 +10,18 @@ export default async function AppMain() {
   const tasks = await fetchTasks();
 
   const parseResult = TasksSchema.safeParse(tasks);
-
   if (!parseResult.success) {
     console.error(parseResult.error);
     return;
   }
 
-  const { data: parsedTasks } = parseResult;
-
-  const formattedTasks: Task[] = parsedTasks.map((task) => ({
-    id: task.id,
-    name: task.name,
-  }));
+  const parsedTasks: Task[] = parseResult.data;
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0 container mx-auto">
       <div className="grid auto-rows-min gap-4 md:grid-cols-[1fr,_min-content]">
         <DailyTasksChecklist
-          tasks={formattedTasks}
+          tasks={parsedTasks}
           currentDayIndex={currentDayIndex}
         />
 
