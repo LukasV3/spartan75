@@ -7,7 +7,7 @@ export const UserSchema = z.object({
   emailAddresses: z.array(
     z.object({
       emailAddress: z.string(),
-    })
+    }),
   ),
 });
 
@@ -36,7 +36,7 @@ export const UserTasksSchema = z.array(
     name: z.string(),
     date: z.coerce.string(), // stored as date YYYY-DD-MM
     completed: z.boolean(),
-  })
+  }),
 );
 
 export type Task = {

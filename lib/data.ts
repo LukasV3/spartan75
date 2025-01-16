@@ -150,7 +150,7 @@ export const fetchUserChallengeStartDate = async () => {
       ? new Date(
           (
             startDateResult.rows[0] as unknown as { start_date: string }
-          ).start_date
+          ).start_date,
         )
       : null;
 

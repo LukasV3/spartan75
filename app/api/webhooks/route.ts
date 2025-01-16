@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
   if (!SIGNING_SECRET) {
     throw new Error(
-      "Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env.local"
+      "Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env.local",
     );
   }
 
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     if (!parseResult.success) {
       console.error(
         "Error: Event data does not match UserSchema:",
-        parseResult.error
+        parseResult.error,
       );
       return new Response("Error: Zod data parsing error", {
         status: 400,
