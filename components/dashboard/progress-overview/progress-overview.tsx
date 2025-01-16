@@ -1,5 +1,7 @@
-import { Calendar } from "@/components/ui/calendar";
 import { fetchUserStreak } from "@/lib/data";
+import { z } from "zod";
+import StreakCalendar from "@/components/dashboard/progress-overview/streak-calendar";
+import CurrentStreak from "@/components/dashboard/progress-overview/current-streak";
 
 type ProgressOverviewProps = {
   currentDayIndex: number;
@@ -8,20 +10,13 @@ type ProgressOverviewProps = {
 const ProgressOverview = async ({ currentDayIndex }: ProgressOverviewProps) => {
   const streak = await fetchUserStreak();
 
-  const selectedDates =
-    streak > 0
-      ? {
-          from: new Date(
-            new Date().setDate(new Date().getDate() - (currentDayIndex - 1))
-          ),
-          to:
-            streak == currentDayIndex
-              ? new Date()
-              : new Date(new Date().setDate(new Date().getDate() - 1)),
-        }
-      : undefined;
-
-  console.log(typeof streak);
+  const toNum = z.string().pipe(z.coerce.number());
+  const parseResult = toNum.safeParse(streak);
+  if (!parseResult.success) {
+    console.error(parseResult.error);
+    return;
+  }
+  const parsedStreak = parseResult.data;
 
   return (
     <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
@@ -38,26 +33,11 @@ const ProgressOverview = async ({ currentDayIndex }: ProgressOverviewProps) => {
 
       <hr />
 
-      <div className="flex flex-col space-y-2">
-        <h3 className="text-sm text-muted-foreground">Current streak:</h3>
-
-        <p className="text-lg font-semibold leading-none tracking-tight">
-          {streak} {streak === 1 ? "day" : "days"}
-          {streak > 0 && <span className="ml-1">🔥</span>}
-        </p>
-      </div>
+      <CurrentStreak streak={parsedStreak} />
 
       <hr />
 
-      <div className="flex flex-col space-y-2">
-        <h3 className="text-sm text-muted-foreground">Calendar view:</h3>
-
-        <Calendar
-          mode="range"
-          selected={selectedDates}
-          className="rounded-md border w-min"
-        />
-      </div>
+      <StreakCalendar streak={parsedStreak} currentDayIndex={currentDayIndex} />
     </div>
   );
 };

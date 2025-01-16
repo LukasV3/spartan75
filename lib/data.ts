@@ -107,7 +107,7 @@ export const fetchUserStreak = async () => {
     return streak;
   } catch (error) {
     console.error("Error: Could not fetch user streak:", error);
-    return 0;
+    throw new Error("Failed to fetch streak data.");
   }
 };
 
