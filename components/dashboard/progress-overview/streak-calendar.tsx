@@ -1,22 +1,24 @@
 import { Calendar } from "@/components/ui/calendar";
+import { fetchUserChallengeStartDate } from "@/lib/data";
 
 type StreakCalendarProps = {
   streak: number;
   currentDayIndex: number;
 };
 
-const StreakCalendar = ({ streak, currentDayIndex }: StreakCalendarProps) => {
-  const selectedDates = streak
-    ? {
-        from: new Date(
-          new Date().setDate(new Date().getDate() - (currentDayIndex - 1))
-        ),
-        to:
-          streak == currentDayIndex
-            ? new Date()
-            : new Date(new Date().setDate(new Date().getDate() - 1)),
-      }
-    : undefined;
+const StreakCalendar = async ({
+  streak,
+  currentDayIndex,
+}: StreakCalendarProps) => {
+  const challengeStartDate = await fetchUserChallengeStartDate();
+  const startDate = new Date(Date.parse(challengeStartDate!));
+  const today = new Date();
+  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
+
+  const selectedDates = {
+    from: startDate,
+    to: streak === currentDayIndex ? today : yesterday,
+  };
 
   return (
     <div className="flex flex-col space-y-2">
@@ -24,7 +26,7 @@ const StreakCalendar = ({ streak, currentDayIndex }: StreakCalendarProps) => {
 
       <Calendar
         mode="range"
-        selected={selectedDates}
+        selected={streak ? selectedDates : undefined}
         className="rounded-md border w-min"
       />
     </div>
