@@ -1,6 +1,6 @@
 "use client";
 
-import { SidebarMenuButton } from "./ui/sidebar";
+import { SidebarMenuButton } from "@/components/ui/sidebar";
 
 export function AppLogo() {
   return (

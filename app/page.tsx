@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,7 +11,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import AppMain from "@/components/AppMain";
+import Dashboard from "@/components/dashboard/dashboard";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function Page() {
@@ -40,7 +40,7 @@ export default async function Page() {
           </div>
         </header>
 
-        <AppMain />
+        <Dashboard />
       </SidebarInset>
     </SidebarProvider>
   );
