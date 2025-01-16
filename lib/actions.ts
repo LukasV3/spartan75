@@ -6,14 +6,13 @@ import { auth } from "@clerk/nextjs/server";
 
 export const toggleTaskComplete = async (taskId: number) => {
   const { userId } = await auth();
-  // const date = new Date().toISOString();
-  // TODO: Use date in conflict
+  const today = new Date().toLocaleDateString();
 
   try {
     await sql`
       UPDATE user_tasks
       SET completed = NOT completed
-      WHERE user_id = ${userId} AND task_id = ${taskId}
+      WHERE user_id = ${userId} AND task_id = ${taskId} AND date = ${today}
     `;
   } catch (error) {
     console.error("Database Error:", error);

@@ -1,13 +1,21 @@
 import DailyTasksChecklist from "@/components/DailyTasksChecklist";
 import ProgressOverview from "@/components/ProgressOverview";
-import { fetchUserTasks } from "@/lib/data";
+import { createUserTasks, fetchUserTasks } from "@/lib/data";
 import { UserTasksSchema } from "@/lib/definitions";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function AppMain() {
   // const [currentStreak, setCurrentStreak] = useState(0);
   const currentDayIndex = 1;
 
   const tasks = await fetchUserTasks();
+
+  // if there are no tasks, create daily tasks and fetch them
+  if (tasks?.length === 0) {
+    const { userId } = await auth();
+    await createUserTasks(userId!);
+    await fetchUserTasks();
+  }
 
   const parseResult = UserTasksSchema.safeParse(tasks);
   if (!parseResult.success) {

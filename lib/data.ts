@@ -23,18 +23,36 @@ export async function fetchTasks() {
 
 export const fetchUserTasks = async () => {
   const { userId } = await auth();
+  const today = new Date().toLocaleDateString();
 
   try {
     const data = await sql<UserTask>`
       SELECT t.id, t.name, ut.date, ut.completed
       FROM user_tasks ut
       JOIN tasks t ON ut.task_id = t.id
-      WHERE ut.user_id = ${userId}
+      WHERE ut.user_id = ${userId} AND ut.date = ${today}
       ORDER BY ut.date ASC;
     `;
 
     return data.rows;
   } catch (error) {
     console.error("Database Error:", error);
+  }
+};
+
+export const createUserTasks = async (id: string) => {
+  try {
+    const today = new Date().toLocaleDateString();
+
+    await sql`
+      INSERT INTO user_tasks (user_id, task_id, date, completed)
+      SELECT ${id}, id, ${today}, false
+      FROM tasks;
+    `;
+  } catch (error) {
+    console.error("Error: Could not create user tasks in db:", error);
+    return new Response("Error: Database error creating user tasks", {
+      status: 400,
+    });
   }
 };

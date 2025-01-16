@@ -4,6 +4,7 @@ import { WebhookEvent } from "@clerk/nextjs/server";
 import { sql } from "@vercel/postgres";
 import { UserSchema } from "@/lib/definitions";
 import { keysToCamel } from "@/lib/utils";
+import { createUserTasks } from "@/lib/data";
 
 export async function POST(req: Request) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET;
@@ -84,20 +85,7 @@ export async function POST(req: Request) {
     }
 
     // Create default user tasks
-    try {
-      const date = new Date().toISOString();
-
-      await sql`
-        INSERT INTO user_tasks (user_id, task_id, date, completed)
-        SELECT ${id}, id, ${date}, false
-        FROM tasks;
-      `;
-    } catch (error) {
-      console.error("Error: Could not create user tasks in db:", error);
-      return new Response("Error: Database error creating user tasks", {
-        status: 400,
-      });
-    }
+    await createUserTasks(id);
   }
 
   return new Response("Webhook received", { status: 200 });
