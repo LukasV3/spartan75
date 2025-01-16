@@ -1,33 +1,33 @@
-"use client";
-
-import Task from "@/components/dashboard/tasks-checklist/task";
+import TaskList from "@/components/dashboard/tasks-checklist/task-list";
 import ProgressBar from "@/components/dashboard/tasks-checklist/progress-bar";
 import DateHeading from "@/components/dashboard/tasks-checklist/date-heading";
-import { useToast } from "@/hooks/use-toast";
-import { type UserTask } from "@/lib/definitions";
-import { useEffect } from "react";
+import { createUserTasks, fetchUserTasks } from "@/lib/data";
+import { UserTasksSchema } from "@/lib/definitions";
+import { auth } from "@clerk/nextjs/server";
 
-type DailyTasksChecklistProps = {
-  tasks: UserTask[];
+type TasksProps = {
   currentDayIndex: number;
 };
 
-export default function Tasks({
-  tasks,
-  currentDayIndex,
-}: DailyTasksChecklistProps) {
-  const { toast } = useToast();
-  const numCompletedTasks = tasks.filter((task) => task.completed).length;
-  const percentageComplete = (numCompletedTasks / 5) * 100;
+const Tasks = async ({ currentDayIndex }: TasksProps) => {
+  const { userId } = await auth();
+  let tasks = await fetchUserTasks(userId!);
 
-  useEffect(() => {
-    if (numCompletedTasks === 5) {
-      toast({
-        title: "Wooooooo! 🥳",
-        description: `You completed day ${currentDayIndex}. ${75 - currentDayIndex} to go.`,
-      });
-    }
-  }, [numCompletedTasks, currentDayIndex, toast]);
+  // if there are no tasks, create tasks and fetch them
+  if (tasks?.length === 0) {
+    await createUserTasks(userId!);
+    tasks = await fetchUserTasks(userId!);
+  }
+
+  const parseResult = UserTasksSchema.safeParse(tasks);
+  if (!parseResult.success) {
+    console.error(parseResult.error);
+    return;
+  }
+
+  const parsedTasks = parseResult.data;
+  const numCompletedTasks = parsedTasks.filter((task) => task.completed).length;
+  const percentageComplete = (numCompletedTasks / 5) * 100;
 
   return (
     <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
@@ -49,17 +49,14 @@ export default function Tasks({
 
         <ProgressBar percentage={percentageComplete} />
 
-        <ul className="flex flex-col">
-          {tasks.map((task) => (
-            <Task
-              key={task.id}
-              taskName={task.name}
-              completed={task.completed}
-              id={task.id}
-            />
-          ))}
-        </ul>
+        <TaskList
+          tasks={parsedTasks}
+          currentDayIndex={currentDayIndex}
+          numCompletedTasks={numCompletedTasks}
+        />
       </div>
     </div>
   );
-}
+};
+
+export default Tasks;

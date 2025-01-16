@@ -21,8 +21,7 @@ export async function fetchTasks() {
   }
 }
 
-export const fetchUserTasks = async () => {
-  const { userId } = await auth();
+export const fetchUserTasks = async (userId: string) => {
   const today = new Date().toISOString().split("T")[0];
 
   try {
@@ -108,6 +107,7 @@ export const fetchUserStreak = async () => {
     return streak;
   } catch (error) {
     console.error("Error: Could not fetch user streak:", error);
+    return 0;
   }
 };
 
