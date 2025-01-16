@@ -17,16 +17,32 @@ export type User = {
   avatar: string;
 };
 
-export const TasksSchema = z.array(
+// export const TasksSchema = z.array(
+//   z.object({
+//     id: z.number(),
+//     name: z.string(),
+//   })
+// );
+
+export const UserTasksSchema = z.array(
   z.object({
     id: z.number(),
     name: z.string(),
+    date: z.string(),
+    completed: z.boolean(),
   })
 );
 
 export type Task = {
   id: number;
   name: string;
+};
+
+export type UserTask = {
+  id: number;
+  name: string;
+  date: string;
+  completed: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -6,10 +6,11 @@ import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { type Task } from "@/lib/definitions";
+import { type UserTask } from "@/lib/definitions";
+import { toggleTaskComplete } from "@/lib/actions";
 
 type DailyTasksChecklistProps = {
-  tasks: Task[];
+  tasks: UserTask[];
   currentDayIndex: number;
 };
 
@@ -28,7 +29,7 @@ export default function DailyTasksChecklist({
     day: "numeric",
   });
 
-  const onTaskClick = (e: React.FormEvent<HTMLButtonElement>) => {
+  const onTaskClick = (e: React.FormEvent<HTMLButtonElement>, id: number) => {
     const checked = (e.target as HTMLElement).getAttribute("aria-checked");
 
     if (checked === "true") {
@@ -52,6 +53,8 @@ export default function DailyTasksChecklist({
         });
       }
     }
+
+    toggleTaskComplete(id);
   };
 
   return (
@@ -103,7 +106,8 @@ export default function DailyTasksChecklist({
           {tasks.map((task) => (
             <TaskItem
               key={task.id}
-              task={task.name}
+              taskName={task.name}
+              completed={task.completed}
               id={task.id}
               onTaskClick={onTaskClick}
             />
@@ -115,13 +119,15 @@ export default function DailyTasksChecklist({
 }
 
 const TaskItem = ({
-  task,
+  taskName,
+  completed,
   id,
   onTaskClick,
 }: {
-  task: string;
+  taskName: string;
+  completed: boolean;
   id: number;
-  onTaskClick: (e: React.FormEvent<HTMLButtonElement>) => void;
+  onTaskClick: (e: React.FormEvent<HTMLButtonElement>, id: number) => void;
 }) => {
   return (
     <li className="first:border-t border-b">
@@ -131,11 +137,12 @@ const TaskItem = ({
       >
         <Checkbox
           id={`checkbox-${id}`}
-          onClick={onTaskClick}
+          onClick={(e) => onTaskClick(e, id)}
           className="rounded-full w-5 h-5 transition-colors hover:bg-muted"
+          checked={completed}
         />
         <p className="leading-none peer-data-[state=checked]:line-through">
-          {task}
+          {taskName}
         </p>
       </Label>
     </li>

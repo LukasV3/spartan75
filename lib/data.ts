@@ -1,5 +1,6 @@
 import { sql } from "@vercel/postgres";
-import { type Task } from "./definitions";
+import { type Task, type UserTask } from "./definitions";
+import { auth } from "@clerk/nextjs/server";
 
 export async function fetchTasks() {
   try {
@@ -19,3 +20,21 @@ export async function fetchTasks() {
     throw new Error("Failed to fetch tasks data.");
   }
 }
+
+export const fetchUserTasks = async () => {
+  const { userId } = await auth();
+
+  try {
+    const data = await sql<UserTask>`
+      SELECT t.id, t.name, ut.date, ut.completed
+      FROM user_tasks ut
+      JOIN tasks t ON ut.task_id = t.id
+      WHERE ut.user_id = ${userId}
+      ORDER BY ut.date ASC;
+    `;
+
+    return data.rows;
+  } catch (error) {
+    console.error("Database Error:", error);
+  }
+};

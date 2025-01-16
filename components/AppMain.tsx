@@ -1,21 +1,21 @@
 import DailyTasksChecklist from "@/components/DailyTasksChecklist";
 import ProgressOverview from "@/components/ProgressOverview";
-import { fetchTasks } from "@/lib/data";
-import { type Task, TasksSchema } from "@/lib/definitions";
+import { fetchUserTasks } from "@/lib/data";
+import { UserTasksSchema } from "@/lib/definitions";
 
 export default async function AppMain() {
   // const [currentStreak, setCurrentStreak] = useState(0);
   const currentDayIndex = 1;
 
-  const tasks = await fetchTasks();
+  const tasks = await fetchUserTasks();
 
-  const parseResult = TasksSchema.safeParse(tasks);
+  const parseResult = UserTasksSchema.safeParse(tasks);
   if (!parseResult.success) {
     console.error(parseResult.error);
     return;
   }
 
-  const parsedTasks: Task[] = parseResult.data;
+  const parsedTasks = parseResult.data;
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0 container mx-auto">

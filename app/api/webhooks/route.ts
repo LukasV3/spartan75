@@ -70,14 +70,31 @@ export async function POST(req: Request) {
       emailAddresses: [{ emailAddress }],
     } = parseResult.data;
 
+    // Create user in db
     try {
       await sql`
-      INSERT INTO users (user_id, username, email)
-      VALUES (${id}, ${username}, ${emailAddress})
+        INSERT INTO users (user_id, username, email)
+        VALUES (${id}, ${username}, ${emailAddress})
       `;
     } catch (error) {
       console.error("Error: Could not create user in db:", error);
       return new Response("Error: Database error creating user", {
+        status: 400,
+      });
+    }
+
+    // Create default user tasks
+    try {
+      const date = new Date().toISOString();
+
+      await sql`
+        INSERT INTO user_tasks (user_id, task_id, date, completed)
+        SELECT ${id}, id, ${date}, false
+        FROM tasks;
+      `;
+    } catch (error) {
+      console.error("Error: Could not create user tasks in db:", error);
+      return new Response("Error: Database error creating user tasks", {
         status: 400,
       });
     }
