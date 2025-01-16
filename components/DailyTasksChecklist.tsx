@@ -3,11 +3,11 @@
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
-import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { type UserTask } from "@/lib/definitions";
 import { toggleTaskComplete } from "@/lib/actions";
+import { useEffect } from "react";
 
 type DailyTasksChecklistProps = {
   tasks: UserTask[];
@@ -18,44 +18,23 @@ export default function DailyTasksChecklist({
   tasks,
   currentDayIndex,
 }: DailyTasksChecklistProps) {
-  const [numCompletedTasks, setNumCompletedTasks] = useState(0);
-  const { toast, dismiss } = useToast();
-
-  const numberOfTasks = tasks.length;
-  const percentageComplete = (numCompletedTasks / numberOfTasks) * 100;
+  const { toast } = useToast();
+  const numCompletedTasks = tasks.filter((task) => task.completed).length;
+  const percentageComplete = (numCompletedTasks / 5) * 100;
   const formattedTodaysDate = new Date().toLocaleDateString("en-gb", {
     weekday: "long",
     month: "short",
     day: "numeric",
   });
 
-  const onTaskClick = (e: React.FormEvent<HTMLButtonElement>, id: number) => {
-    const checked = (e.target as HTMLElement).getAttribute("aria-checked");
-
-    if (checked === "true") {
-      // task is being unchecked
-      setNumCompletedTasks((a) => a - 1);
-
-      if (percentageComplete === 100) {
-        // decrementStreak();
-        dismiss(); // hide toast
-      }
-    } else {
-      // task is being checked
-      setNumCompletedTasks((a) => a + 1);
-
-      // if on next render all tasks will be complete
-      if (numCompletedTasks + 1 === numberOfTasks) {
-        // incrementStreak();
-        toast({
-          title: "Wooooooo! 🥳",
-          description: `You completed day ${currentDayIndex}. ${75 - currentDayIndex} to go.`,
-        });
-      }
+  useEffect(() => {
+    if (numCompletedTasks === 5) {
+      toast({
+        title: "Wooooooo! 🥳",
+        description: `You completed day ${currentDayIndex}. ${75 - currentDayIndex} to go.`,
+      });
     }
-
-    toggleTaskComplete(id);
-  };
+  }, [numCompletedTasks, currentDayIndex, toast]);
 
   return (
     <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
@@ -109,7 +88,6 @@ export default function DailyTasksChecklist({
               taskName={task.name}
               completed={task.completed}
               id={task.id}
-              onTaskClick={onTaskClick}
             />
           ))}
         </ul>
@@ -122,12 +100,10 @@ const TaskItem = ({
   taskName,
   completed,
   id,
-  onTaskClick,
 }: {
   taskName: string;
   completed: boolean;
   id: number;
-  onTaskClick: (e: React.FormEvent<HTMLButtonElement>, id: number) => void;
 }) => {
   return (
     <li className="first:border-t border-b">
@@ -137,7 +113,7 @@ const TaskItem = ({
       >
         <Checkbox
           id={`checkbox-${id}`}
-          onClick={(e) => onTaskClick(e, id)}
+          onClick={() => toggleTaskComplete(id)}
           className="rounded-full w-5 h-5 transition-colors hover:bg-muted"
           checked={completed}
         />
