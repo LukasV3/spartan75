@@ -6,7 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 
 export const toggleTaskComplete = async (taskId: number) => {
   const { userId } = await auth();
-  const today = new Date().toLocaleDateString();
+  const today = new Date().toISOString().split("T")[0];
 
   try {
     await sql`

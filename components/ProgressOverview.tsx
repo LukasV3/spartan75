@@ -10,19 +10,18 @@ export default function ProgressOverview({
   currentStreak: number;
   currentDayIndex: number;
 }) {
-  const selectedDates = currentStreak
-    ? {
-        from: new Date(
-          new Date().setDate(new Date().getDate() - (currentDayIndex - 1))
-        ),
-        to:
-          currentStreak === currentDayIndex
-            ? new Date()
-            : currentStreak
-              ? new Date(new Date().setDate(new Date().getDate() - 1))
-              : undefined,
-      }
-    : undefined;
+  const selectedDates =
+    currentStreak > 0
+      ? {
+          from: new Date(
+            new Date().setDate(new Date().getDate() - (currentDayIndex - 1))
+          ),
+          to:
+            currentStreak == currentDayIndex
+              ? new Date()
+              : new Date(new Date().setDate(new Date().getDate() - 1)),
+        }
+      : undefined;
 
   return (
     <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">

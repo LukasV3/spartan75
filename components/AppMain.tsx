@@ -1,21 +1,40 @@
 import DailyTasksChecklist from "@/components/DailyTasksChecklist";
 import ProgressOverview from "@/components/ProgressOverview";
-import { createUserTasks, fetchUserTasks } from "@/lib/data";
+import {
+  createUserTasks,
+  fetchUserChallengeStartDate,
+  fetchUserStreak,
+  fetchUserTasks,
+} from "@/lib/data";
 import { UserTasksSchema } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function AppMain() {
-  // const [currentStreak, setCurrentStreak] = useState(0);
-  const currentDayIndex = 1;
-
   const tasks = await fetchUserTasks();
 
-  // if there are no tasks, create daily tasks and fetch them
+  // if there are no tasks, create tasks and fetch them
   if (tasks?.length === 0) {
     const { userId } = await auth();
     await createUserTasks(userId!);
     await fetchUserTasks();
   }
+
+  const streak = await fetchUserStreak();
+  const challengeStartDate = await fetchUserChallengeStartDate();
+
+  const currentDayIndex = () => {
+    if (challengeStartDate) {
+      const today = new Date();
+      const dayDifference =
+        Math.floor(
+          (today.getTime() - new Date(challengeStartDate).getTime()) /
+            (1000 * 60 * 60 * 24)
+        ) + 1;
+      return dayDifference;
+    } else {
+      return 1;
+    }
+  };
 
   const parseResult = UserTasksSchema.safeParse(tasks);
   if (!parseResult.success) {
@@ -30,10 +49,13 @@ export default async function AppMain() {
       <div className="grid auto-rows-min gap-4 md:grid-cols-[1fr,_min-content]">
         <DailyTasksChecklist
           tasks={parsedTasks}
-          currentDayIndex={currentDayIndex}
+          currentDayIndex={currentDayIndex()}
         />
 
-        <ProgressOverview currentStreak={0} currentDayIndex={currentDayIndex} />
+        <ProgressOverview
+          currentStreak={streak || 0}
+          currentDayIndex={currentDayIndex()}
+        />
       </div>
     </div>
   );

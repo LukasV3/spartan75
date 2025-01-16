@@ -28,7 +28,7 @@ export const UserTasksSchema = z.array(
   z.object({
     id: z.number(),
     name: z.string(),
-    date: z.string(),
+    date: z.coerce.string(), // stored as date YYYY-DD-MM
     completed: z.boolean(),
   })
 );
