@@ -1,5 +1,5 @@
 import { sql } from "@vercel/postgres";
-import { type Task, type UserTask } from "./definitions";
+import { type DatabaseUser, type Task, type UserTask } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
 
 export async function fetchTasks() {
@@ -51,6 +51,24 @@ export const createUserTasks = async (id: string) => {
   } catch (error) {
     console.error("Error: Could not create user tasks in db:", error);
     return new Response("Error: Database error creating user tasks", {
+      status: 400,
+    });
+  }
+};
+
+export const createDatabaseUser = async ({
+  user_id,
+  username,
+  email,
+}: DatabaseUser) => {
+  try {
+    await sql`
+      INSERT INTO users (user_id, username, email)
+      VALUES (${user_id}, ${username}, ${email})
+    `;
+  } catch (error) {
+    console.error("Error: Could not create user in db:", error);
+    return new Response("Error: Database error creating user", {
       status: 400,
     });
   }

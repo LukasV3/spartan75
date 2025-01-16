@@ -11,6 +11,12 @@ export const UserSchema = z.object({
   ),
 });
 
+export type DatabaseUser = {
+  user_id: string;
+  username: string;
+  email: string;
+};
+
 export type User = {
   username: string;
   email: string;

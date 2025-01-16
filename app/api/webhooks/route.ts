@@ -1,10 +1,9 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
-import { sql } from "@vercel/postgres";
 import { UserSchema } from "@/lib/definitions";
 import { keysToCamel } from "@/lib/utils";
-import { createUserTasks } from "@/lib/data";
+import { createUserTasks, createDatabaseUser } from "@/lib/data";
 
 export async function POST(req: Request) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET;
@@ -71,20 +70,7 @@ export async function POST(req: Request) {
       emailAddresses: [{ emailAddress }],
     } = parseResult.data;
 
-    // Create user in db
-    try {
-      await sql`
-        INSERT INTO users (user_id, username, email)
-        VALUES (${id}, ${username}, ${emailAddress})
-      `;
-    } catch (error) {
-      console.error("Error: Could not create user in db:", error);
-      return new Response("Error: Database error creating user", {
-        status: 400,
-      });
-    }
-
-    // Create default user tasks
+    await createDatabaseUser({ user_id: id, username, email: emailAddress });
     await createUserTasks(id);
   }
 
