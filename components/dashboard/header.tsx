@@ -27,7 +27,7 @@ const Header = () => {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="ml-auto pr-3 flex items-center">
+        <div className="ml-auto flex items-center md:pr-3">
           <Button variant="ghost" size="icon" asChild>
             <Link href="https://github.com/LukasV3" target="_blank">
               <Github />
