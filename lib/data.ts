@@ -1,3 +1,5 @@
+"use server";
+
 import { sql } from "@vercel/postgres";
 import { type DatabaseUser, type Task, type UserTask } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
@@ -46,7 +48,8 @@ export const createUserTasks = async (id: string) => {
     await sql`
       INSERT INTO user_tasks (user_id, task_id, date, completed)
       SELECT ${id}, id, ${today}, false
-      FROM tasks;
+      FROM tasks
+      ON CONFLICT (user_id, task_id, date) DO NOTHING;
     `;
   } catch (error) {
     console.error("Error: Could not create user tasks in db:", error);
@@ -150,7 +153,7 @@ export const fetchUserChallengeStartDate = async () => {
       ? new Date(
           (
             startDateResult.rows[0] as unknown as { start_date: string }
-          ).start_date,
+          ).start_date
         )
       : null;
 
