@@ -21,7 +21,7 @@ const ProgressOverview = async () => {
   const parsedStreak = parseResult.data;
 
   return (
-    <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
+    <div className="h-min rounded-xl p-6 m-4 space-y-6 bg-muted/50">
       <div className="flex flex-col space-y-1.5">
         <h3 className="text-2xl font-semibold tracking-tight">
           Progress Overview
