@@ -3,9 +3,8 @@
 import TaskList from "@/components/dashboard/tasks-checklist/task-list";
 import ProgressBar from "@/components/dashboard/tasks-checklist/progress-bar";
 import { type UserTask } from "@/lib/definitions";
-import { useEffect, useOptimistic, useTransition } from "react";
+import { useOptimistic, useTransition } from "react";
 import { toggleTaskComplete } from "@/lib/actions";
-import { useToast } from "@/hooks/use-toast";
 
 type TaskListContainerProps = {
   tasks: UserTask[];
@@ -13,7 +12,6 @@ type TaskListContainerProps = {
 
 const TaskListContainer = ({ tasks }: TaskListContainerProps) => {
   const [, startTransition] = useTransition();
-  const { toast } = useToast();
   const [optimisticTasks, toggleOptimisticTask] = useOptimistic<
     UserTask[],
     UserTask
@@ -24,20 +22,8 @@ const TaskListContainer = ({ tasks }: TaskListContainerProps) => {
         : task
     );
   });
-  const percentComplete =
-    (tasks.filter((task) => task.completed).length / 5) * 100;
   const optimisticPercentComplete =
     (optimisticTasks.filter((task) => task.completed).length / 5) * 100;
-
-  // display message once all daily tasks are complete
-  useEffect(() => {
-    if (percentComplete === 100) {
-      toast({
-        title: "Wooooooo! 🥳",
-        description: `Good job.`,
-      });
-    }
-  }, [percentComplete, toast]);
 
   const onTaskClick = (id: number) => {
     // Find the task being toggled
