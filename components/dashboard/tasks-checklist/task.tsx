@@ -1,14 +1,14 @@
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toggleTaskComplete } from "@/lib/actions";
 
 type TaskProps = {
   taskName: string;
   completed: boolean;
   id: number;
+  onTaskClick: (id: number) => void;
 };
 
-const Task = ({ taskName, completed, id }: TaskProps) => {
+const Task = ({ taskName, completed, id, onTaskClick }: TaskProps) => {
   return (
     <li className="first:border-t border-b">
       <Label
@@ -17,7 +17,7 @@ const Task = ({ taskName, completed, id }: TaskProps) => {
       >
         <Checkbox
           id={`checkbox-${id}`}
-          onClick={() => toggleTaskComplete(id)}
+          onClick={() => onTaskClick(id)}
           className="rounded-full w-5 h-5 transition-colors hover:bg-muted"
           checked={completed}
         />

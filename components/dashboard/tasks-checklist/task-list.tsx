@@ -1,32 +1,12 @@
-"use client";
-
 import Task from "@/components/dashboard/tasks-checklist/task";
-import { useToast } from "@/hooks/use-toast";
 import { type UserTask } from "@/lib/definitions";
-import { useEffect } from "react";
 
 type TaskListProps = {
   tasks: UserTask[];
-  currentDayIndex: number;
-  numCompletedTasks: number;
+  onTaskClick: (id: number) => void;
 };
 
-const TaskList = ({
-  tasks,
-  currentDayIndex,
-  numCompletedTasks,
-}: TaskListProps) => {
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (numCompletedTasks === 5) {
-      toast({
-        title: "Wooooooo! 🥳",
-        description: `You completed day ${currentDayIndex}. ${75 - currentDayIndex} to go.`,
-      });
-    }
-  }, [numCompletedTasks, currentDayIndex, toast]);
-
+const TaskList = ({ tasks, onTaskClick }: TaskListProps) => {
   return (
     <ul className="flex flex-col">
       {tasks.map((task) => (
@@ -35,6 +15,7 @@ const TaskList = ({
           taskName={task.name}
           completed={task.completed}
           id={task.id}
+          onTaskClick={onTaskClick}
         />
       ))}
     </ul>

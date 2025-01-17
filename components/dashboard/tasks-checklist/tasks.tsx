@@ -1,15 +1,10 @@
-import TaskList from "@/components/dashboard/tasks-checklist/task-list";
-import ProgressBar from "@/components/dashboard/tasks-checklist/progress-bar";
 import DateHeading from "@/components/dashboard/tasks-checklist/date-heading";
 import { createUserTasks, fetchUserTasks } from "@/lib/data";
 import { UserTasksSchema } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
+import TaskListContainer from "@/components/dashboard/tasks-checklist/task-list-container";
 
-type TasksProps = {
-  currentDayIndex: number;
-};
-
-const Tasks = async ({ currentDayIndex }: TasksProps) => {
+const Tasks = async () => {
   const { userId } = await auth();
   let tasks = await fetchUserTasks(userId!);
 
@@ -26,8 +21,6 @@ const Tasks = async ({ currentDayIndex }: TasksProps) => {
   }
 
   const parsedTasks = parseResult.data;
-  const numCompletedTasks = parsedTasks.filter((task) => task.completed).length;
-  const percentageComplete = (numCompletedTasks / 5) * 100;
 
   return (
     <div className="h-min rounded-xl p-6 space-y-6 bg-muted/50">
@@ -47,13 +40,7 @@ const Tasks = async ({ currentDayIndex }: TasksProps) => {
       <div className="flex flex-col space-y-4">
         <DateHeading />
 
-        <ProgressBar percentage={percentageComplete} />
-
-        <TaskList
-          tasks={parsedTasks}
-          currentDayIndex={currentDayIndex}
-          numCompletedTasks={numCompletedTasks}
-        />
+        <TaskListContainer tasks={parsedTasks} />
       </div>
     </div>
   );
