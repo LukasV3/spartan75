@@ -49,7 +49,7 @@ export const getCurrentDayIndex = (challengeStartDate: string | null) => {
     const dayDifference =
       Math.floor(
         (today.getTime() - new Date(challengeStartDate).getTime()) /
-          (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       ) + 1;
 
     return dayDifference;
