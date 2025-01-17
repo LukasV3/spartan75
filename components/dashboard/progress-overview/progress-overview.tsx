@@ -2,13 +2,15 @@ import { fetchUserStreak } from "@/lib/data";
 import { z } from "zod";
 import StreakCalendar from "@/components/dashboard/progress-overview/streak-calendar";
 import CurrentStreak from "@/components/dashboard/progress-overview/current-streak";
+import { getCurrentDayIndex } from "@/lib/utils";
+import { fetchUserChallengeStartDate } from "@/lib/data";
 
-type ProgressOverviewProps = {
-  currentDayIndex: number;
-};
-
-const ProgressOverview = async ({ currentDayIndex }: ProgressOverviewProps) => {
-  const streak = await fetchUserStreak();
+const ProgressOverview = async () => {
+  const [challengeStartDate, streak] = await Promise.all([
+    fetchUserChallengeStartDate(),
+    fetchUserStreak(),
+  ]);
+  const currentDayIndex = getCurrentDayIndex(challengeStartDate);
 
   const toNum = z.string().pipe(z.coerce.number());
   const parseResult = toNum.safeParse(streak);

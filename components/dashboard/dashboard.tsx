@@ -1,9 +1,7 @@
 import Header from "@/components/dashboard/header";
 import Tasks from "@/components/dashboard/tasks-checklist/tasks";
 import ProgressOverview from "@/components/dashboard/progress-overview/progress-overview";
-import { fetchUserChallengeStartDate } from "@/lib/data";
 import { SidebarInset } from "@/components/ui/sidebar";
-import { getCurrentDayIndex } from "@/lib/utils";
 import { Suspense } from "react";
 import {
   TasksSkeleton,
@@ -11,9 +9,6 @@ import {
 } from "@/components/ui/skeletons";
 
 export default async function Dashboard() {
-  const challengeStartDate = await fetchUserChallengeStartDate();
-  const currentDayIndex = getCurrentDayIndex(challengeStartDate);
-
   return (
     <SidebarInset>
       <Header />
@@ -25,7 +20,7 @@ export default async function Dashboard() {
           </Suspense>
 
           <Suspense fallback={<ProgressOverviewSkeleton />}>
-            <ProgressOverview currentDayIndex={currentDayIndex} />
+            <ProgressOverview />
           </Suspense>
         </div>
       </div>
