@@ -78,10 +78,14 @@ export const createDatabaseUser = async ({
 };
 
 export const fetchUserStreak = async () => {
+  type UserStreak = {
+    streak_length: number;
+  };
+
   const { userId } = await auth();
 
   try {
-    const data = await sql<{ streak_length: number }[]>`
+    const data = await sql<UserStreak>`
       WITH completed_tasks_per_day AS (
         SELECT
           ut.date,
@@ -121,10 +125,8 @@ export const fetchUserStreak = async () => {
       LIMIT 1;
     `;
 
-    const streak =
-      data.rows.length > 0
-        ? (data.rows[0] as unknown as { streak_length: number }).streak_length
-        : 0;
+    const result = data.rows;
+    const streak = result.length > 0 ? result[0].streak_length : null;
     return streak;
   } catch (error) {
     console.error("Error: Could not fetch user streak:", error);
