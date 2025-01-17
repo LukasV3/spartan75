@@ -32,7 +32,7 @@ export const fetchUserTasks = async (userId: string) => {
       FROM user_tasks ut
       JOIN tasks t ON ut.task_id = t.id
       WHERE ut.user_id = ${userId} AND ut.date = ${today}
-      ORDER BY ut.date ASC;
+      ORDER BY t.id ASC;
     `;
 
     return data.rows;
