@@ -1,27 +1,8 @@
 "use server";
 
 import { sql } from "@vercel/postgres";
-import { type DatabaseUser, type Task, type UserTask } from "@/lib/definitions";
+import { type DatabaseUser, type UserTask } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
-
-export async function fetchTasks() {
-  try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
-    console.log("Fetching tasks data...");
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    const data = await sql<Task>`SELECT * FROM tasks`;
-
-    console.log("Data fetch completed after 3 seconds.");
-
-    return data.rows;
-  } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to fetch tasks data.");
-  }
-}
 
 export const fetchUserTasks = async (userId: string) => {
   const today = new Date().toISOString().split("T")[0];
@@ -38,6 +19,7 @@ export const fetchUserTasks = async (userId: string) => {
     return data.rows;
   } catch (error) {
     console.error("Database Error:", error);
+    throw new Error("Failed to fetch tasks data.");
   }
 };
 
