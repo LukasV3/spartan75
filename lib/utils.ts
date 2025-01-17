@@ -43,13 +43,13 @@ export const keysToCamel = function (obj: Object): Object {
   return obj;
 };
 
-export const getCurrentDayIndex = (challengeStartDate: string | undefined) => {
+export const getCurrentDayIndex = (challengeStartDate: string | null) => {
   if (challengeStartDate) {
     const today = new Date();
     const dayDifference =
       Math.floor(
         (today.getTime() - new Date(challengeStartDate).getTime()) /
-          (1000 * 60 * 60 * 24),
+          (1000 * 60 * 60 * 24)
       ) + 1;
 
     return dayDifference;

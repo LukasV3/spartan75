@@ -133,29 +133,34 @@ export const fetchUserStreak = async () => {
 };
 
 export const fetchUserChallengeStartDate = async () => {
+  // get the earliest date when all tasks were completed for a user and treat this as the start date of the challenge.
+  type StartDate = {
+    start_date: string;
+  };
+
   const { userId } = await auth();
 
-  const startDateResult: { rows: { start_date: string }[] } = await sql`
-  SELECT MIN(ut.date) AS start_date
-  FROM user_tasks ut
-  WHERE ut.user_id = ${userId}
-    AND ut.date IN (
-      SELECT ut.date
-      FROM user_tasks
-      WHERE user_id = ${userId}
-      GROUP BY ut.date
-      HAVING COUNT(*) = 5 AND SUM(CASE WHEN completed THEN 1 ELSE 0 END) = 5
-    )
-`;
+  const data = await sql<StartDate>`
+    SELECT MIN(ut.date) AS start_date
+    FROM user_tasks ut
+    WHERE ut.user_id = ${userId}
+      AND ut.date = (
+        SELECT MIN(sub.date)
+        FROM (
+          SELECT ut.date
+          FROM user_tasks ut
+          WHERE ut.user_id = ${userId}
+          GROUP BY ut.date
+          HAVING COUNT(*) = 5 AND SUM(CASE WHEN ut.completed THEN 1 ELSE 0 END) = 5
+        ) sub
+      );
+  `;
 
+  const result = data.rows;
   const startDate =
-    startDateResult.rows.length > 0 && startDateResult.rows[0].start_date
-      ? new Date(
-          (
-            startDateResult.rows[0] as unknown as { start_date: string }
-          ).start_date
-        )
+    result.length > 0 && result[0].start_date
+      ? new Date(result[0].start_date).toISOString().split("T")[0]
       : null;
 
-  return startDate?.toISOString().split("T")[0];
+  return startDate;
 };
