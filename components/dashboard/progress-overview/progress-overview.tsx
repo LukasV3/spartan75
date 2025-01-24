@@ -1,5 +1,4 @@
-import { fetchUserStreak } from "@/lib/data";
-import { z } from "zod";
+import { fetchCurrentStreak } from "@/lib/data";
 import StreakCalendar from "@/components/dashboard/progress-overview/streak-calendar";
 import CurrentStreak from "@/components/dashboard/progress-overview/current-streak";
 import { getCurrentDayIndex } from "@/lib/utils";
@@ -8,17 +7,9 @@ import { fetchUserChallengeStartDate } from "@/lib/data";
 const ProgressOverview = async () => {
   const [challengeStartDate, streak] = await Promise.all([
     fetchUserChallengeStartDate(),
-    fetchUserStreak(),
+    fetchCurrentStreak(),
   ]);
   const currentDayIndex = getCurrentDayIndex(challengeStartDate);
-
-  const toNum = z.string().pipe(z.coerce.number());
-  const parseResult = toNum.safeParse(streak);
-  if (!parseResult.success) {
-    console.error(parseResult.error);
-    return;
-  }
-  const parsedStreak = parseResult.data;
 
   return (
     <div className="h-min rounded-xl p-6 m-4 space-y-6 bg-muted/50">
@@ -35,7 +26,7 @@ const ProgressOverview = async () => {
 
       <hr />
 
-      <CurrentStreak streak={parsedStreak} />
+      <CurrentStreak streak={streak} />
 
       <hr />
 

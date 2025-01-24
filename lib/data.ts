@@ -77,57 +77,52 @@ export const createDatabaseUser = async ({
   }
 };
 
-export const fetchUserStreak = async () => {
-  type UserStreak = {
-    streak_length: number;
-  };
-
+export const fetchCurrentStreak = async () => {
   const { userId } = await auth();
 
   try {
-    const data = await sql<UserStreak>`
-      WITH completed_tasks_per_day AS (
+    const data = await sql<{ streak_length: number }>`
+      WITH completed_days AS (
         SELECT
-          ut.date,
-          COUNT(*) AS completed_count
+          date
         FROM
-          user_tasks ut
+          user_tasks
         WHERE
-          ut.user_id = ${userId} AND ut.completed = true
+          user_id = ${userId} AND completed = true
         GROUP BY
-          ut.date
+          date
         HAVING
           COUNT(*) = 5
       ),
-      streaks AS (
+      consecutive_days AS (
         SELECT
           date,
-          ROW_NUMBER() OVER (ORDER BY date ASC)
-          - ROW_NUMBER() OVER (ORDER BY date::DATE) AS streak_group
+          ROW_NUMBER() OVER (ORDER BY date) - CAST(EXTRACT(EPOCH FROM date)::INT / (24 * 60 * 60) AS INTEGER) AS streak_group
         FROM
-          completed_tasks_per_day
+          completed_days
+      ),
+      current_streak_group AS (
+        SELECT
+          streak_group
+        FROM
+          consecutive_days
+        WHERE
+          date IN (
+            SELECT date
+            FROM completed_days
+            WHERE date = CURRENT_DATE OR date = CURRENT_DATE - INTERVAL '1 day'
+          )
+        LIMIT 1
       )
       SELECT
         COUNT(*) AS streak_length
       FROM
-        streaks
+        consecutive_days
       WHERE
-        streak_group = (
-          SELECT
-            ROW_NUMBER() OVER (ORDER BY date ASC)
-            - ROW_NUMBER() OVER (ORDER BY date::DATE)
-          FROM
-            completed_tasks_per_day
-          ORDER BY
-            date DESC
-          LIMIT 1
-        )
-      LIMIT 1;
+        streak_group = (SELECT streak_group FROM current_streak_group);
     `;
 
-    const result = data.rows;
-    const streak = result.length > 0 ? result[0].streak_length : null;
-    return streak;
+    return data.rows[0]?.streak_length ?? 0;
   } catch (error) {
     console.error("Error: Could not fetch user streak:", error);
     throw new Error("Failed to fetch streak data.");
