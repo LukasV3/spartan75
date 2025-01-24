@@ -39,7 +39,7 @@ const ProgressOverview = async () => {
 
       <hr />
 
-      <StreakCalendar streak={parsedStreak} currentDayIndex={currentDayIndex} />
+      <StreakCalendar />
     </div>
   );
 };

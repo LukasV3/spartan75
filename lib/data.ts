@@ -180,3 +180,30 @@ export const fetchUserLastProgress = async (userId: string) => {
 
   return data.rows[0]?.last_progress_date;
 };
+
+export const fetchCompletedDates = async () => {
+  const { userId } = await auth();
+
+  try {
+    const data = await sql<{ date: string }>`
+      SELECT
+        date
+      FROM
+        user_tasks
+      WHERE
+        user_id = ${userId}
+        AND completed = true
+      GROUP BY
+        date
+      HAVING
+        COUNT(*) = 5
+      ORDER BY
+        date ASC;
+    `;
+
+    return data.rows.map((row) => row.date);
+  } catch (error) {
+    console.error("Error fetching completed dates:", error);
+    throw new Error("Failed to fetch completed dates.");
+  }
+};
