@@ -5,15 +5,15 @@ import { type DatabaseUser, type UserTask } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
 import { startOfToday, lightFormat } from "date-fns";
 
-export const fetchUserTasks = async (userId: string) => {
-  const today = lightFormat(startOfToday(), "yyyy-MM-dd");
+export const fetchUserTasks = async (userId: string, date?: string) => {
+  const tasksDate = date ?? lightFormat(startOfToday(), "yyyy-MM-dd");
 
   try {
     const data = await sql<UserTask>`
       SELECT t.id, t.name, ut.date, ut.completed
       FROM user_tasks ut
       JOIN tasks t ON ut.task_id = t.id
-      WHERE ut.user_id = ${userId} AND ut.date = ${today}
+      WHERE ut.user_id = ${userId} AND ut.date = ${tasksDate}
       ORDER BY t.id ASC;
     `;
 
