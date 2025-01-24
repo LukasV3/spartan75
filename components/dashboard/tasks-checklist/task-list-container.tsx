@@ -6,6 +6,7 @@ import { type UserTask } from "@/lib/definitions";
 import { useOptimistic, useTransition } from "react";
 import { toggleTaskComplete } from "@/lib/actions";
 import { fetchUserTasks } from "@/lib/data";
+import { isToday } from "date-fns";
 
 type TaskListContainerProps = {
   tasks: UserTask[];
@@ -67,7 +68,11 @@ const TaskListContainer = ({
     <>
       <ProgressBar percentage={optimisticPercentComplete} />
 
-      <TaskList tasks={optimisticTasks} onTaskClick={onTaskClick} />
+      <TaskList
+        tasks={optimisticTasks}
+        onTaskClick={onTaskClick}
+        disabled={!isToday(date)}
+      />
     </>
   );
 };

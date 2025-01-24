@@ -4,9 +4,10 @@ import { type UserTask } from "@/lib/definitions";
 type TaskListProps = {
   tasks: UserTask[];
   onTaskClick: (id: number) => void;
+  disabled: boolean;
 };
 
-const TaskList = ({ tasks, onTaskClick }: TaskListProps) => {
+const TaskList = ({ tasks, onTaskClick, disabled }: TaskListProps) => {
   return (
     <ul className="flex flex-col">
       {tasks.map((task) => (
@@ -16,6 +17,7 @@ const TaskList = ({ tasks, onTaskClick }: TaskListProps) => {
           completed={task.completed}
           id={task.id}
           onTaskClick={onTaskClick}
+          disabled={disabled}
         />
       ))}
     </ul>
