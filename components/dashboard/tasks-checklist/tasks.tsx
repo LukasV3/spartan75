@@ -1,23 +1,56 @@
 import DateHeading from "@/components/dashboard/tasks-checklist/date-heading";
-import { createUserTasks, fetchUserTasks } from "@/lib/data";
+import {
+  createUserTasks,
+  fetchUserLastProgress,
+  fetchUserTasks,
+} from "@/lib/data";
 import { UserTasksSchema } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
 import TaskListContainer from "@/components/dashboard/tasks-checklist/task-list-container";
+import { startOfToday, isBefore, addDays, lightFormat } from "date-fns";
+
+const handleTaskCreation = async (
+  userId: string,
+  lastProgress: Date | null
+) => {
+  const today = startOfToday();
+
+  if (!lastProgress) {
+    // Create today's tasks for a new user
+    await createUserTasks(userId);
+  } else if (isBefore(lastProgress, today)) {
+    // Handle missing days
+    let currentDay = addDays(lastProgress, 1);
+    const missingDays = [];
+
+    while (isBefore(currentDay, today)) {
+      missingDays.push(currentDay);
+      currentDay = addDays(currentDay, 1);
+    }
+    missingDays.push(today);
+
+    const formattedDays = missingDays.map((day) =>
+      lightFormat(day, "yyyy-MM-dd")
+    );
+
+    // Create tasks for today and missing days
+    await createUserTasks(userId, formattedDays);
+  }
+};
 
 const Tasks = async () => {
-  const { userId } = await auth();
-  let tasks = await fetchUserTasks(userId!);
+  const { userId, redirectToSignIn } = await auth();
+  if (!userId) return redirectToSignIn();
 
-  // if there are no tasks, create tasks and fetch them
-  if (tasks?.length === 0) {
-    await createUserTasks(userId!);
-    tasks = await fetchUserTasks(userId!);
-  }
+  const lastProgressDate = await fetchUserLastProgress(userId);
+  await handleTaskCreation(userId, lastProgressDate);
 
+  const tasks = await fetchUserTasks(userId!);
   const parseResult = UserTasksSchema.safeParse(tasks);
+
   if (!parseResult.success) {
     console.error(parseResult.error);
-    return;
+    return null;
   }
 
   const parsedTasks = parseResult.data;

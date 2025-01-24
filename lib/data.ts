@@ -3,9 +3,10 @@
 import { sql } from "@vercel/postgres";
 import { type DatabaseUser, type UserTask } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
+import { startOfToday, lightFormat } from "date-fns";
 
 export const fetchUserTasks = async (userId: string) => {
-  const today = new Date().toISOString().split("T")[0];
+  const today = lightFormat(startOfToday(), "yyyy-MM-dd");
 
   try {
     const data = await sql<UserTask>`
@@ -23,15 +24,32 @@ export const fetchUserTasks = async (userId: string) => {
   }
 };
 
-export const createUserTasks = async (id: string) => {
+/**
+ * Create user tasks for a given user id and days
+ * @param id - The user id
+ * @param days - The days to create user tasks for
+ * @returns
+ */
+export const createUserTasks = async (id: string, days?: string[]) => {
   try {
-    const today = new Date().toISOString().split("T")[0];
+    const today = lightFormat(startOfToday(), "yyyy-MM-dd");
+    const taskDays = days ?? [today]; // Default to today if no days are provided
 
+    // Insert tasks for all days
+    for (const day of taskDays) {
+      await sql`
+        INSERT INTO user_tasks (user_id, task_id, date, completed)
+        SELECT ${id}, t.id, ${day}::date, false
+        FROM tasks t
+        ON CONFLICT (user_id, task_id, date) DO NOTHING;
+      `;
+    }
+
+    // Update user last_progress_date to today
     await sql`
-      INSERT INTO user_tasks (user_id, task_id, date, completed)
-      SELECT ${id}, id, ${today}, false
-      FROM tasks
-      ON CONFLICT (user_id, task_id, date) DO NOTHING;
+      UPDATE Users
+      SET last_progress_date = ${today}
+      WHERE user_id = ${id};
     `;
   } catch (error) {
     console.error("Error: Could not create user tasks in db:", error);
@@ -143,8 +161,22 @@ export const fetchUserChallengeStartDate = async () => {
   const result = data.rows;
   const startDate =
     result.length > 0 && result[0].start_date
-      ? new Date(result[0].start_date).toISOString().split("T")[0]
+      ? lightFormat(new Date(result[0].start_date), "yyyy-MM-dd")
       : null;
 
   return startDate;
+};
+
+export const fetchUserLastProgress = async (userId: string) => {
+  type LastProgressDate = {
+    last_progress_date: Date | null;
+  };
+
+  const data = await sql<LastProgressDate>`
+    SELECT last_progress_date
+    FROM Users
+    WHERE user_id = ${userId};
+  `;
+
+  return data.rows[0]?.last_progress_date;
 };
