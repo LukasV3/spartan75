@@ -31,7 +31,7 @@ const DateHeading = ({ date, setDate }: DateHeadingProps) => {
       <Button
         variant="ghost"
         className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-        onClick={() => setDate(incrementDate(date, 1))}
+        onClick={() => setDate(incrementDate(date, -1))}
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
@@ -45,7 +45,7 @@ const DateHeading = ({ date, setDate }: DateHeadingProps) => {
       <Button
         variant="ghost"
         className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-        onClick={() => setDate(incrementDate(date, -1))}
+        onClick={() => setDate(incrementDate(date, 1))}
       >
         <ChevronRight className="h-4 w-4" />
       </Button>
