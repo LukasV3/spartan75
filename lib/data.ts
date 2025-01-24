@@ -1,25 +1,8 @@
+"use server";
+
 import { sql } from "@vercel/postgres";
-import { type DatabaseUser, type Task, type UserTask } from "@/lib/definitions";
+import { type DatabaseUser, type UserTask } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
-
-export async function fetchTasks() {
-  try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
-
-    console.log("Fetching tasks data...");
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    const data = await sql<Task>`SELECT * FROM tasks`;
-
-    console.log("Data fetch completed after 3 seconds.");
-
-    return data.rows;
-  } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to fetch tasks data.");
-  }
-}
 
 export const fetchUserTasks = async (userId: string) => {
   const today = new Date().toISOString().split("T")[0];
@@ -30,12 +13,13 @@ export const fetchUserTasks = async (userId: string) => {
       FROM user_tasks ut
       JOIN tasks t ON ut.task_id = t.id
       WHERE ut.user_id = ${userId} AND ut.date = ${today}
-      ORDER BY ut.date ASC;
+      ORDER BY t.id ASC;
     `;
 
     return data.rows;
   } catch (error) {
     console.error("Database Error:", error);
+    throw new Error("Failed to fetch tasks data.");
   }
 };
 
@@ -46,7 +30,8 @@ export const createUserTasks = async (id: string) => {
     await sql`
       INSERT INTO user_tasks (user_id, task_id, date, completed)
       SELECT ${id}, id, ${today}, false
-      FROM tasks;
+      FROM tasks
+      ON CONFLICT (user_id, task_id, date) DO NOTHING;
     `;
   } catch (error) {
     console.error("Error: Could not create user tasks in db:", error);
@@ -75,10 +60,14 @@ export const createDatabaseUser = async ({
 };
 
 export const fetchUserStreak = async () => {
+  type UserStreak = {
+    streak_length: number;
+  };
+
   const { userId } = await auth();
 
   try {
-    const data = await sql<{ streak_length: number }[]>`
+    const data = await sql<UserStreak>`
       WITH completed_tasks_per_day AS (
         SELECT
           ut.date,
@@ -118,10 +107,8 @@ export const fetchUserStreak = async () => {
       LIMIT 1;
     `;
 
-    const streak =
-      data.rows.length > 0
-        ? (data.rows[0] as unknown as { streak_length: number }).streak_length
-        : 0;
+    const result = data.rows;
+    const streak = result.length > 0 ? result[0].streak_length : null;
     return streak;
   } catch (error) {
     console.error("Error: Could not fetch user streak:", error);
@@ -130,29 +117,34 @@ export const fetchUserStreak = async () => {
 };
 
 export const fetchUserChallengeStartDate = async () => {
+  // get the earliest date when all tasks were completed for a user and treat this as the start date of the challenge.
+  type StartDate = {
+    start_date: string;
+  };
+
   const { userId } = await auth();
 
-  const startDateResult: { rows: { start_date: string }[] } = await sql`
-  SELECT MIN(ut.date) AS start_date
-  FROM user_tasks ut
-  WHERE ut.user_id = ${userId}
-    AND ut.date IN (
-      SELECT ut.date
-      FROM user_tasks
-      WHERE user_id = ${userId}
-      GROUP BY ut.date
-      HAVING COUNT(*) = 5 AND SUM(CASE WHEN completed THEN 1 ELSE 0 END) = 5
-    )
-`;
+  const data = await sql<StartDate>`
+    SELECT MIN(ut.date) AS start_date
+    FROM user_tasks ut
+    WHERE ut.user_id = ${userId}
+      AND ut.date = (
+        SELECT MIN(sub.date)
+        FROM (
+          SELECT ut.date
+          FROM user_tasks ut
+          WHERE ut.user_id = ${userId}
+          GROUP BY ut.date
+          HAVING COUNT(*) = 5 AND SUM(CASE WHEN ut.completed THEN 1 ELSE 0 END) = 5
+        ) sub
+      );
+  `;
 
+  const result = data.rows;
   const startDate =
-    startDateResult.rows.length > 0 && startDateResult.rows[0].start_date
-      ? new Date(
-          (
-            startDateResult.rows[0] as unknown as { start_date: string }
-          ).start_date,
-        )
+    result.length > 0 && result[0].start_date
+      ? new Date(result[0].start_date).toISOString().split("T")[0]
       : null;
 
-  return startDate?.toISOString().split("T")[0];
+  return startDate;
 };
