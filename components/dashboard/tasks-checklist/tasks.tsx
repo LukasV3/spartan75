@@ -9,18 +9,16 @@ import { auth } from "@clerk/nextjs/server";
 import TaskListContainer from "@/components/dashboard/tasks-checklist/task-list-container";
 import { startOfToday, isBefore, addDays, lightFormat } from "date-fns";
 
-const handleTaskCreation = async (
-  userId: string,
-  lastProgress: Date | null
-) => {
+const handleTaskCreation = async (userId: string) => {
+  const lastProgressDate = await fetchUserLastProgress(userId);
   const today = startOfToday();
 
-  if (!lastProgress) {
+  if (!lastProgressDate) {
     // Create today's tasks for a new user
     await createUserTasks(userId);
-  } else if (isBefore(lastProgress, today)) {
+  } else if (isBefore(lastProgressDate, today)) {
     // Handle missing days
-    let currentDay = addDays(lastProgress, 1);
+    let currentDay = addDays(lastProgressDate, 1);
     const missingDays = [];
 
     while (isBefore(currentDay, today)) {
@@ -33,7 +31,7 @@ const handleTaskCreation = async (
       lightFormat(day, "yyyy-MM-dd")
     );
 
-    // Create tasks for today and missing days
+    // Create tasks for missing days and today
     await createUserTasks(userId, formattedDays);
   }
 };
@@ -42,10 +40,9 @@ const Tasks = async () => {
   const { userId, redirectToSignIn } = await auth();
   if (!userId) return redirectToSignIn();
 
-  const lastProgressDate = await fetchUserLastProgress(userId);
-  await handleTaskCreation(userId, lastProgressDate);
+  await handleTaskCreation(userId);
 
-  const tasks = await fetchUserTasks(userId!);
+  const tasks = await fetchUserTasks(userId);
   const parseResult = UserTasksSchema.safeParse(tasks);
 
   if (!parseResult.success) {
