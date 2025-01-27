@@ -5,7 +5,7 @@ type ProgressBarProps = {
   percentage: number;
 };
 
-const ProgressBar = ({ percentage }: ProgressBarProps) => {
+export const ProgressBar = ({ percentage }: ProgressBarProps) => {
   return (
     <div className="flex items-center gap-x-2 pb-1.5">
       <h3 className="text-sm text-muted-foreground shrink-0">
@@ -22,5 +22,3 @@ const ProgressBar = ({ percentage }: ProgressBarProps) => {
     </div>
   );
 };
-
-export default ProgressBar;

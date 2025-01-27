@@ -1,5 +1,5 @@
 import { fetchCurrentStreak } from "@/lib/data";
-import StreakCalendar from "@/components/dashboard/progress-overview/streak-calendar";
+import { StreakCalendar } from "@/components/dashboard/progress-overview/StreakCalendar/StreakCalendar";
 import CurrentStreak from "@/components/dashboard/progress-overview/current-streak";
 import { getCurrentDayIndex } from "@/lib/utils";
 import { fetchUserChallengeStartDate } from "@/lib/data";

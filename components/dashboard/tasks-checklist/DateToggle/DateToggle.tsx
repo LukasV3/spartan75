@@ -1,46 +1,14 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  isToday,
-  isTomorrow,
-  isYesterday,
-  format,
-  addDays,
-  lightFormat,
-  startOfToday,
-} from "date-fns";
 import { Separator } from "@/components/ui/separator";
-
-type DateHeadingProps = {
-  date: string;
-  setDate: (newDate: string) => void;
-};
-
-const DateHeading = ({ date, setDate }: DateHeadingProps) => {
-  const getDateText = (date: string) => {
-    if (isYesterday(date)) return "Yesterday";
-    if (isToday(date)) return "Today";
-    if (isTomorrow(date)) return "Tomorrow";
-    return format(date, "EEEE");
-  };
-
-  return (
-    <div className="text-lg font-semibold tracking-tight flex items-center gap-x-2">
-      <p>{format(date, "d MMM")}</p>
-      <span className="text-xs">●</span>
-      <p>{getDateText(date)}</p>
-
-      <DateToggle date={date} setDate={setDate} />
-    </div>
-  );
-};
+import { addDays, lightFormat, startOfToday } from "date-fns";
 
 type DateToggleProps = {
   date: string;
   setDate: (newDate: string) => void;
 };
 
-const DateToggle = ({ date, setDate }: DateToggleProps) => {
+export const DateToggle = ({ date, setDate }: DateToggleProps) => {
   const incrementDate = (date: string, increment: number) => {
     return lightFormat(addDays(date, increment), "yyyy-MM-dd");
   };
@@ -78,5 +46,3 @@ const DateToggle = ({ date, setDate }: DateToggleProps) => {
     </div>
   );
 };
-
-export default DateHeading;

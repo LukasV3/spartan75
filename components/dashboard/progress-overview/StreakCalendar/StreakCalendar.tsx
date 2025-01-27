@@ -1,7 +1,7 @@
 import { Calendar } from "@/components/ui/calendar";
 import { fetchCompletedDates } from "@/lib/data";
 
-const StreakCalendar = async () => {
+export const StreakCalendar = async () => {
   const completedDates = await fetchCompletedDates();
   // TODO: Convert dates to Date objects using zod schema validation
   const formattedCompletedDates = completedDates.map((date) => new Date(date));
@@ -18,5 +18,3 @@ const StreakCalendar = async () => {
     </div>
   );
 };
-
-export default StreakCalendar;

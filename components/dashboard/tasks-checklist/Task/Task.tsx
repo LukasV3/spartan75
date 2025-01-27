@@ -9,7 +9,7 @@ type TaskProps = {
   disabled: boolean;
 };
 
-const Task = ({
+export const Task = ({
   taskName,
   completed,
   id,
@@ -36,5 +36,3 @@ const Task = ({
     </li>
   );
 };
-
-export default Task;

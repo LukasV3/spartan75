@@ -1,5 +1,5 @@
 import Header from "@/components/dashboard/header";
-import Tasks from "@/components/dashboard/tasks-checklist/tasks";
+import { Tasks } from "@/components/dashboard/tasks-checklist/Tasks/Tasks";
 import ProgressOverview from "@/components/dashboard/progress-overview/progress-overview";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Suspense } from "react";

@@ -1,13 +1,13 @@
 "use client";
 
-import DateHeading from "@/components/dashboard/tasks-checklist/date-heading";
+import { DateHeading } from "@/components/dashboard/tasks-checklist/DateHeading/DateHeading";
 import { fetchUserTasks } from "@/lib/data";
 import { UserTask, UserTasksSchema } from "@/lib/definitions";
-import TaskListContainer from "@/components/dashboard/tasks-checklist/task-list-container";
+import { TaskListContainer } from "@/components/dashboard/tasks-checklist/TaskListContainer/TaskListContainer";
 import { startOfToday, lightFormat } from "date-fns";
 import { useEffect, useState } from "react";
 
-const Tasks = ({ userId }: { userId: string }) => {
+export const Tasks = ({ userId }: { userId: string }) => {
   const defaultDate = lightFormat(startOfToday(), "yyyy-MM-dd");
   const [date, setDate] = useState<string>(defaultDate);
   const [tasks, setTasks] = useState<UserTask[]>([]);
@@ -54,5 +54,3 @@ const Tasks = ({ userId }: { userId: string }) => {
     </div>
   );
 };
-
-export default Tasks;
