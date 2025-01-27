@@ -6,9 +6,16 @@ type TaskProps = {
   completed: boolean;
   id: number;
   onTaskClick: (id: number) => void;
+  disabled: boolean;
 };
 
-const Task = ({ taskName, completed, id, onTaskClick }: TaskProps) => {
+const Task = ({
+  taskName,
+  completed,
+  id,
+  onTaskClick,
+  disabled,
+}: TaskProps) => {
   return (
     <li className="first:border-t border-b">
       <Label
@@ -20,6 +27,7 @@ const Task = ({ taskName, completed, id, onTaskClick }: TaskProps) => {
           onClick={() => onTaskClick(id)}
           className="rounded-full w-5 h-5 transition-colors hover:bg-muted"
           checked={completed}
+          disabled={disabled}
         />
         <p className="leading-none peer-data-[state=checked]:line-through">
           {taskName}

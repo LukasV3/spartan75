@@ -3,16 +3,17 @@
 import { sql } from "@vercel/postgres";
 import { type DatabaseUser, type UserTask } from "@/lib/definitions";
 import { auth } from "@clerk/nextjs/server";
+import { startOfToday, lightFormat } from "date-fns";
 
-export const fetchUserTasks = async (userId: string) => {
-  const today = new Date().toISOString().split("T")[0];
+export const fetchUserTasks = async (userId: string, date?: string) => {
+  const tasksDate = date ?? lightFormat(startOfToday(), "yyyy-MM-dd");
 
   try {
     const data = await sql<UserTask>`
       SELECT t.id, t.name, ut.date, ut.completed
       FROM user_tasks ut
       JOIN tasks t ON ut.task_id = t.id
-      WHERE ut.user_id = ${userId} AND ut.date = ${today}
+      WHERE ut.user_id = ${userId} AND ut.date = ${tasksDate}
       ORDER BY t.id ASC;
     `;
 
@@ -23,15 +24,32 @@ export const fetchUserTasks = async (userId: string) => {
   }
 };
 
-export const createUserTasks = async (id: string) => {
+/**
+ * Create user tasks for a given user id and days
+ * @param id - The user id
+ * @param days - The days to create user tasks for
+ * @returns
+ */
+export const createUserTasks = async (id: string, days?: string[]) => {
   try {
-    const today = new Date().toISOString().split("T")[0];
+    const today = lightFormat(startOfToday(), "yyyy-MM-dd");
+    const taskDays = days ?? [today]; // Default to today if no days are provided
 
+    // Insert tasks for all days
+    for (const day of taskDays) {
+      await sql`
+        INSERT INTO user_tasks (user_id, task_id, date, completed)
+        SELECT ${id}, t.id, ${day}::date, false
+        FROM tasks t
+        ON CONFLICT (user_id, task_id, date) DO NOTHING;
+      `;
+    }
+
+    // Update user last_progress_date to today
     await sql`
-      INSERT INTO user_tasks (user_id, task_id, date, completed)
-      SELECT ${id}, id, ${today}, false
-      FROM tasks
-      ON CONFLICT (user_id, task_id, date) DO NOTHING;
+      UPDATE Users
+      SET last_progress_date = ${today}
+      WHERE user_id = ${id};
     `;
   } catch (error) {
     console.error("Error: Could not create user tasks in db:", error);
@@ -59,57 +77,52 @@ export const createDatabaseUser = async ({
   }
 };
 
-export const fetchUserStreak = async () => {
-  type UserStreak = {
-    streak_length: number;
-  };
-
+export const fetchCurrentStreak = async () => {
   const { userId } = await auth();
 
   try {
-    const data = await sql<UserStreak>`
-      WITH completed_tasks_per_day AS (
+    const data = await sql<{ streak_length: number }>`
+      WITH completed_days AS (
         SELECT
-          ut.date,
-          COUNT(*) AS completed_count
+          date
         FROM
-          user_tasks ut
+          user_tasks
         WHERE
-          ut.user_id = ${userId} AND ut.completed = true
+          user_id = ${userId} AND completed = true
         GROUP BY
-          ut.date
+          date
         HAVING
           COUNT(*) = 5
       ),
-      streaks AS (
+      consecutive_days AS (
         SELECT
           date,
-          ROW_NUMBER() OVER (ORDER BY date ASC)
-          - ROW_NUMBER() OVER (ORDER BY date::DATE) AS streak_group
+          ROW_NUMBER() OVER (ORDER BY date) - CAST(EXTRACT(EPOCH FROM date)::INT / (24 * 60 * 60) AS INTEGER) AS streak_group
         FROM
-          completed_tasks_per_day
+          completed_days
+      ),
+      current_streak_group AS (
+        SELECT
+          streak_group
+        FROM
+          consecutive_days
+        WHERE
+          date IN (
+            SELECT date
+            FROM completed_days
+            WHERE date = CURRENT_DATE OR date = CURRENT_DATE - INTERVAL '1 day'
+          )
+        LIMIT 1
       )
       SELECT
         COUNT(*) AS streak_length
       FROM
-        streaks
+        consecutive_days
       WHERE
-        streak_group = (
-          SELECT
-            ROW_NUMBER() OVER (ORDER BY date ASC)
-            - ROW_NUMBER() OVER (ORDER BY date::DATE)
-          FROM
-            completed_tasks_per_day
-          ORDER BY
-            date DESC
-          LIMIT 1
-        )
-      LIMIT 1;
+        streak_group = (SELECT streak_group FROM current_streak_group);
     `;
 
-    const result = data.rows;
-    const streak = result.length > 0 ? result[0].streak_length : null;
-    return streak;
+    return data.rows[0]?.streak_length ?? 0;
   } catch (error) {
     console.error("Error: Could not fetch user streak:", error);
     throw new Error("Failed to fetch streak data.");
@@ -143,8 +156,49 @@ export const fetchUserChallengeStartDate = async () => {
   const result = data.rows;
   const startDate =
     result.length > 0 && result[0].start_date
-      ? new Date(result[0].start_date).toISOString().split("T")[0]
+      ? lightFormat(new Date(result[0].start_date), "yyyy-MM-dd")
       : null;
 
   return startDate;
+};
+
+export const fetchUserLastProgress = async (userId: string) => {
+  type LastProgressDate = {
+    last_progress_date: Date | null;
+  };
+
+  const data = await sql<LastProgressDate>`
+    SELECT last_progress_date
+    FROM Users
+    WHERE user_id = ${userId};
+  `;
+
+  return data.rows[0]?.last_progress_date;
+};
+
+export const fetchCompletedDates = async () => {
+  const { userId } = await auth();
+
+  try {
+    const data = await sql<{ date: string }>`
+      SELECT
+        date
+      FROM
+        user_tasks
+      WHERE
+        user_id = ${userId}
+        AND completed = true
+      GROUP BY
+        date
+      HAVING
+        COUNT(*) = 5
+      ORDER BY
+        date ASC;
+    `;
+
+    return data.rows.map((row) => row.date);
+  } catch (error) {
+    console.error("Error fetching completed dates:", error);
+    throw new Error("Failed to fetch completed dates.");
+  }
 };
