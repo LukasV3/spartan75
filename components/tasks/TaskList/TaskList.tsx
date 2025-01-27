@@ -1,4 +1,4 @@
-import { Task } from "@/components/dashboard/tasks-checklist/Task/Task";
+import { Task } from "@/components/tasks/Task/Task";
 import { type UserTask } from "@/lib/definitions";
 
 type TaskListProps = {

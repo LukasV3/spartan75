@@ -1,5 +1,5 @@
 import { isToday, isTomorrow, isYesterday, format } from "date-fns";
-import { DateToggle } from "@/components/dashboard/tasks-checklist/DateToggle/DateToggle";
+import { DateToggle } from "@/components/tasks/DateToggle/DateToggle";
 
 type DateHeadingProps = {
   date: string;

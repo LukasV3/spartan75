@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
-import { DateHeading } from "./DateHeading";
+import { DateToggle } from "./DateToggle";
 
 const meta = {
-  title: "Date Heading",
-  component: DateHeading,
+  title: "Tasks/DateToggle",
+  component: DateToggle,
   args: {
     date: "2025-01-01",
     setDate: fn(),
   },
-} satisfies Meta<typeof DateHeading>;
+} satisfies Meta<typeof DateToggle>;
 
 export default meta;
-type Story = StoryObj<typeof DateHeading>;
+type Story = StoryObj<typeof DateToggle>;
 
 export const Default: Story = {};

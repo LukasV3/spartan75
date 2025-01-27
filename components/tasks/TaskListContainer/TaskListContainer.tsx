@@ -1,7 +1,7 @@
 "use client";
 
-import { TaskList } from "@/components/dashboard/tasks-checklist/TaskList/TaskList";
-import { ProgressBar } from "@/components/dashboard/tasks-checklist/ProgressBar/ProgressBar";
+import { TaskList } from "@/components/tasks/TaskList/TaskList";
+import { ProgressBar } from "@/components/tasks/ProgressBar/ProgressBar";
 import { type UserTask } from "@/lib/definitions";
 import { useOptimistic, useTransition } from "react";
 import { toggleTaskComplete } from "@/lib/actions";

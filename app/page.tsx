@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import Dashboard from "@/components/dashboard/dashboard";
+import { Dashboard } from "@/components/dashboard/Dashboard/Dashboard";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function Page() {

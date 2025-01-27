@@ -3,7 +3,7 @@ import { fn } from "@storybook/test";
 import { Task } from "./Task";
 
 const meta = {
-  title: "Task",
+  title: "Tasks/Task",
   component: Task,
   args: {
     taskName: "Test task",

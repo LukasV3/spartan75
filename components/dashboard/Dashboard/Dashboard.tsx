@@ -1,6 +1,6 @@
-import Header from "@/components/dashboard/header";
-import { Tasks } from "@/components/dashboard/tasks-checklist/Tasks/Tasks";
-import ProgressOverview from "@/components/dashboard/progress-overview/progress-overview";
+import { Header } from "@/components/dashboard/Header/Header";
+import { Tasks } from "@/components/tasks/Tasks/Tasks";
+import { ProgressOverview } from "@/components/progress/ProgressOverview/ProgressOverview";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { Suspense } from "react";
 import {
@@ -11,7 +11,7 @@ import { createUserTasks, fetchUserLastProgress } from "@/lib/data";
 import { auth } from "@clerk/nextjs/server";
 import { startOfToday, isBefore, addDays, lightFormat } from "date-fns";
 
-export default async function Dashboard() {
+export async function Dashboard() {
   const { userId, redirectToSignIn } = await auth();
   if (!userId) return redirectToSignIn();
 

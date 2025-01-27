@@ -2,7 +2,7 @@ type CurrentStreakProps = {
   streak: number;
 };
 
-const CurrentStreak = ({ streak }: CurrentStreakProps) => {
+export const CurrentStreak = ({ streak }: CurrentStreakProps) => {
   return (
     <div className="flex flex-col space-y-2">
       <h3 className="text-sm text-muted-foreground">Current streak:</h3>
@@ -14,5 +14,3 @@ const CurrentStreak = ({ streak }: CurrentStreakProps) => {
     </div>
   );
 };
-
-export default CurrentStreak;

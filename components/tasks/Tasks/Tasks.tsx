@@ -1,9 +1,9 @@
 "use client";
 
-import { DateHeading } from "@/components/dashboard/tasks-checklist/DateHeading/DateHeading";
+import { DateHeading } from "@/components/tasks/DateHeading/DateHeading";
 import { fetchUserTasks } from "@/lib/data";
 import { UserTask, UserTasksSchema } from "@/lib/definitions";
-import { TaskListContainer } from "@/components/dashboard/tasks-checklist/TaskListContainer/TaskListContainer";
+import { TaskListContainer } from "@/components/tasks/TaskListContainer/TaskListContainer";
 import { startOfToday, lightFormat } from "date-fns";
 import { useEffect, useState } from "react";
 

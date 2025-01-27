@@ -1,10 +1,10 @@
 import { fetchCurrentStreak } from "@/lib/data";
-import { StreakCalendar } from "@/components/dashboard/progress-overview/StreakCalendar/StreakCalendar";
-import CurrentStreak from "@/components/dashboard/progress-overview/current-streak";
+import { StreakCalendar } from "@/components/progress/StreakCalendar/StreakCalendar";
+import { CurrentStreak } from "@/components/progress/CurrentStreak/CurrentStreak";
 import { getCurrentDayIndex } from "@/lib/utils";
 import { fetchUserChallengeStartDate } from "@/lib/data";
 
-const ProgressOverview = async () => {
+export const ProgressOverview = async () => {
   const [challengeStartDate, streak] = await Promise.all([
     fetchUserChallengeStartDate(),
     fetchCurrentStreak(),
@@ -34,5 +34,3 @@ const ProgressOverview = async () => {
     </div>
   );
 };
-
-export default ProgressOverview;
