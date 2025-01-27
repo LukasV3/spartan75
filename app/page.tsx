@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/AppSidebar/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Dashboard } from "@/components/dashboard/Dashboard/Dashboard";
 import { auth } from "@clerk/nextjs/server";

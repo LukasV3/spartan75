@@ -2,8 +2,8 @@ import * as React from "react";
 
 // import { NavMain } from "@/components/nav-main";
 // import { NavProjects } from "@/components/nav-projects";
-import { NavUser } from "@/components/sidebar/nav-user";
-import { NavCreateUser } from "@/components/sidebar/nav-create-user";
+import { NavUser } from "@/components/sidebar/NavUser/NavUser";
+import { NavCreateUser } from "@/components/sidebar/NavCreateUser/NavCreateUser";
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +11,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { AppLogo } from "./app-logo";
+import { AppLogo } from "@/components/sidebar/AppLogo/AppLogo";
 import { currentUser } from "@clerk/nextjs/server";
 import { UserSchema } from "@/lib/definitions";
 
