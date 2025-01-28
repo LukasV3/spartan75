@@ -9,7 +9,7 @@ import {
   UserTasksSchema,
 } from "@/lib/definitions";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { startOfToday, lightFormat } from "date-fns";
+import { startOfToday, lightFormat, isBefore, addDays } from "date-fns";
 
 export const fetchUserTasks = async (userId: string, date?: string) => {
   const tasksDate = date ?? lightFormat(startOfToday(), "yyyy-MM-dd");
@@ -251,5 +251,36 @@ export const fetchUserData = async (): Promise<{
   } catch (error) {
     console.error("Failed to fetch user data:", error);
     return null;
+  }
+};
+
+export const handleTaskCreation = async (userId: string) => {
+  try {
+    const lastProgressDate = await fetchUserLastProgress(userId);
+    const today = startOfToday();
+
+    if (!lastProgressDate) {
+      // Create today's tasks for a new user
+      await createUserTasks(userId);
+    } else if (isBefore(lastProgressDate, today)) {
+      // Handle missing days
+      let currentDay = addDays(lastProgressDate, 1);
+      const missingDays = [];
+
+      while (isBefore(currentDay, today)) {
+        missingDays.push(currentDay);
+        currentDay = addDays(currentDay, 1);
+      }
+      missingDays.push(today);
+
+      const formattedDays = missingDays.map((day) =>
+        lightFormat(day, "yyyy-MM-dd")
+      );
+
+      // Create tasks for missing days and today
+      await createUserTasks(userId, formattedDays);
+    }
+  } catch (error) {
+    console.error("Failed to create tasks:", error);
   }
 };
