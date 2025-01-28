@@ -1,18 +1,22 @@
 import { AppSidebar } from "@/components/sidebar/AppSidebar/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Dashboard } from "@/components/dashboard/Dashboard/Dashboard";
-import { auth } from "@clerk/nextjs/server";
+import { fetchUserData } from "@/lib/data";
 
 export default async function Page() {
-  const { userId, redirectToSignIn } = await auth();
+  const userData = await fetchUserData();
 
-  if (!userId) return redirectToSignIn();
+  if (!userData) {
+    return <div>Error: Failed to load user data</div>; // TODO: Improve error handling. Use notFound()?
+  }
+
+  const { userId, user } = userData;
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar user={user} />
 
-      <Dashboard />
+      <Dashboard userId={userId} />
     </SidebarProvider>
   );
 }

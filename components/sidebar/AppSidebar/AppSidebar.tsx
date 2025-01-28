@@ -1,9 +1,4 @@
-import * as React from "react";
-
-// import { NavMain } from "@/components/nav-main";
-// import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/sidebar/NavUser/NavUser";
-import { NavCreateUser } from "@/components/sidebar/NavCreateUser/NavCreateUser";
 import {
   Sidebar,
   SidebarContent,
@@ -12,38 +7,13 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { AppLogo } from "@/components/sidebar/AppLogo/AppLogo";
-import { currentUser } from "@clerk/nextjs/server";
-import { UserSchema } from "@/lib/definitions";
+import { type User } from "@/lib/definitions";
 
-export async function AppSidebar() {
-  const user = await currentUser();
-
-  // TODO: Handle if user is not signed in
-  if (!user) return <div>No user :(</div>;
-
-  // Runtime type checks
-  const parseResult = UserSchema.safeParse(user);
-  if (!parseResult.success) {
-    console.error(parseResult.error);
-    return;
-  }
-
-  const {
-    username,
-    emailAddresses: [{ emailAddress }],
-    imageUrl,
-  } = parseResult.data;
-
-  const formattedUser = {
-    username,
-    email: emailAddress,
-    avatar: imageUrl,
-  };
-
+export async function AppSidebar({ user }: { user: User }) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        {user ? <NavUser user={formattedUser} /> : <NavCreateUser />}
+        <NavUser user={user} />
       </SidebarHeader>
 
       <SidebarContent>

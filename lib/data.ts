@@ -1,8 +1,13 @@
 "use server";
 
 import { sql } from "@vercel/postgres";
-import { type DatabaseUser, type UserTask } from "@/lib/definitions";
-import { auth } from "@clerk/nextjs/server";
+import {
+  type DatabaseUser,
+  type UserTask,
+  type User,
+  UserSchema,
+} from "@/lib/definitions";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { startOfToday, lightFormat } from "date-fns";
 
 export const fetchUserTasks = async (userId: string, date?: string) => {
@@ -200,5 +205,43 @@ export const fetchCompletedDates = async () => {
   } catch (error) {
     console.error("Error fetching completed dates:", error);
     throw new Error("Failed to fetch completed dates.");
+  }
+};
+
+export const fetchUserData = async (): Promise<{
+  userId: string;
+  user: User;
+} | null> => {
+  try {
+    const rawUser = await currentUser();
+    const { userId, redirectToSignIn } = await auth();
+
+    if (!rawUser || !userId) {
+      redirectToSignIn();
+      return null;
+    }
+
+    const parseResult = UserSchema.safeParse(rawUser);
+    if (!parseResult.success) {
+      console.error(parseResult.error);
+      return null; // TODO: Handle error
+    }
+
+    const {
+      username,
+      emailAddresses: [{ emailAddress }],
+      imageUrl,
+    } = parseResult.data;
+
+    const user = {
+      username,
+      email: emailAddress,
+      avatar: imageUrl,
+    };
+
+    return { userId, user };
+  } catch (error) {
+    console.error("Failed to fetch user data:", error);
+    return null;
   }
 };

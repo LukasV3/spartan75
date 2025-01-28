@@ -8,13 +8,9 @@ import {
   ProgressOverviewSkeleton,
 } from "@/components/ui/skeletons";
 import { createUserTasks, fetchUserLastProgress } from "@/lib/data";
-import { auth } from "@clerk/nextjs/server";
 import { startOfToday, isBefore, addDays, lightFormat } from "date-fns";
 
-export async function Dashboard() {
-  const { userId, redirectToSignIn } = await auth();
-  if (!userId) return redirectToSignIn();
-
+export async function Dashboard({ userId }: { userId: string }) {
   await handleTaskCreation(userId);
 
   return (
