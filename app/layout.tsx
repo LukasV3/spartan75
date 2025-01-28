@@ -26,7 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html
+        lang="en"
+        suppressHydrationWarning // needed to avoid the hydration warning caused by next/themes - https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
+      >
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
