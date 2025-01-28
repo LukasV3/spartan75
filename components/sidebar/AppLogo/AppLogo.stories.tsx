@@ -5,13 +5,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 const meta = {
   title: "Sidebar/App Logo",
   component: AppLogo,
-  args: {
-    streak: 5,
-  },
   decorators: [
     (Story) => (
       <SidebarProvider>
-        <Story />
+        <div style={{ width: "300px" }}>
+          <Story />
+        </div>
       </SidebarProvider>
     ),
   ],

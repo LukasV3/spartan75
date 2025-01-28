@@ -8,7 +8,9 @@ const meta = {
   decorators: [
     (Story) => (
       <SidebarProvider>
-        <Story />
+        <div style={{ width: "300px" }}>
+          <Story />
+        </div>
       </SidebarProvider>
     ),
   ],
