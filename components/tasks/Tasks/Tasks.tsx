@@ -14,9 +14,16 @@ export const Tasks = ({ userId }: { userId: string }) => {
 
   // fetch tasks for the given user id and date
   useEffect(() => {
-    fetchUserTasks(userId, date).then((newTasks) => {
-      setTasks(newTasks);
-    });
+    const fetchTasks = async () => {
+      try {
+        const newTasks = await fetchUserTasks(userId, date);
+        setTasks(newTasks);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      }
+    };
+
+    fetchTasks();
   }, [userId, date]);
 
   return (
