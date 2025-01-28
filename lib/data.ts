@@ -91,8 +91,12 @@ export const createDatabaseUser = async ({
 };
 
 export const fetchCurrentStreak = async (userId: string) => {
+  type StreakData = {
+    streak_length: string;
+  };
+
   try {
-    const data = await sql<{ streak_length: number }>`
+    const data = await sql<StreakData>`
       WITH completed_days AS (
         SELECT
           date
@@ -133,7 +137,17 @@ export const fetchCurrentStreak = async (userId: string) => {
         streak_group = (SELECT streak_group FROM current_streak_group);
     `;
 
-    return data.rows[0]?.streak_length ?? 0;
+    const parsedResult = z
+      .object({
+        streak_length: z.coerce.number(),
+      })
+      .safeParse(data.rows[0]);
+    if (!parsedResult.success) {
+      console.error(parsedResult.error);
+      throw new Error("Failed to parse streak data.");
+    }
+
+    return parsedResult.data.streak_length ?? 0;
   } catch (error) {
     console.error("Error: Could not fetch user streak:", error);
     throw new Error("Failed to fetch streak data.");
@@ -143,7 +157,7 @@ export const fetchCurrentStreak = async (userId: string) => {
 export const fetchUserChallengeStartDate = async (userId: string) => {
   // get the earliest date when all tasks were completed for a user and treat this as the start date of the challenge.
   type StartDate = {
-    start_date: string;
+    start_date: Date;
   };
 
   const data = await sql<StartDate>`
@@ -162,11 +176,21 @@ export const fetchUserChallengeStartDate = async (userId: string) => {
       );
   `;
 
-  const result = data.rows;
-  const startDate =
-    result.length > 0 && result[0].start_date
-      ? lightFormat(new Date(result[0].start_date), "yyyy-MM-dd")
-      : null;
+  const result = data.rows[0];
+
+  const parseResult = z
+    .object({
+      start_date: z.coerce.date(),
+    })
+    .safeParse(result);
+  if (!parseResult.success) {
+    console.error(parseResult.error);
+    throw new Error("Failed to parse start date data.");
+  }
+
+  const startDate = result.start_date
+    ? lightFormat(new Date(result.start_date), "yyyy-MM-dd")
+    : null;
 
   return startDate;
 };
