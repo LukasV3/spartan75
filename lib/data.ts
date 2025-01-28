@@ -213,8 +213,8 @@ export const fetchUserData = async (): Promise<{
   user: User;
 } | null> => {
   try {
-    const rawUser = await currentUser();
-    const { userId, redirectToSignIn } = await auth();
+    const [rawUser, authResult] = await Promise.all([currentUser(), auth()]);
+    const { userId, redirectToSignIn } = authResult;
 
     if (!rawUser || !userId) {
       redirectToSignIn();
