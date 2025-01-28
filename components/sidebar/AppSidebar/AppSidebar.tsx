@@ -9,7 +9,7 @@ import {
 import { AppLogo } from "@/components/sidebar/AppLogo/AppLogo";
 import { type User } from "@/lib/definitions";
 
-export async function AppSidebar({ user }: { user: User }) {
+export function AppSidebar({ user }: { user: User }) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>

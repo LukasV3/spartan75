@@ -2,7 +2,7 @@
 
 import { DateHeading } from "@/components/tasks/DateHeading/DateHeading";
 import { fetchUserTasks } from "@/lib/data";
-import { UserTask, UserTasksSchema } from "@/lib/definitions";
+import { UserTask } from "@/lib/definitions";
 import { TaskListContainer } from "@/components/tasks/TaskListContainer/TaskListContainer";
 import { startOfToday, lightFormat } from "date-fns";
 import { useEffect, useState } from "react";
@@ -15,14 +15,7 @@ export const Tasks = ({ userId }: { userId: string }) => {
   // fetch tasks for the given user id and date
   useEffect(() => {
     fetchUserTasks(userId, date).then((newTasks) => {
-      const parseResult = UserTasksSchema.safeParse(newTasks);
-
-      if (!parseResult.success) {
-        console.error(parseResult.error);
-        return;
-      }
-
-      setTasks(parseResult.data);
+      setTasks(newTasks);
     });
   }, [userId, date]);
 

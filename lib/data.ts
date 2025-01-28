@@ -6,6 +6,7 @@ import {
   type UserTask,
   type User,
   UserSchema,
+  UserTasksSchema,
 } from "@/lib/definitions";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { startOfToday, lightFormat } from "date-fns";
@@ -22,7 +23,13 @@ export const fetchUserTasks = async (userId: string, date?: string) => {
       ORDER BY t.id ASC;
     `;
 
-    return data.rows;
+    const parseResult = UserTasksSchema.safeParse(data.rows);
+    if (!parseResult.success) {
+      console.error(parseResult.error);
+      throw new Error("Failed to parse tasks data.");
+    }
+
+    return parseResult.data;
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch tasks data.");
@@ -214,6 +221,7 @@ export const fetchUserData = async (): Promise<{
 } | null> => {
   try {
     const [rawUser, authResult] = await Promise.all([currentUser(), auth()]);
+
     const { userId, redirectToSignIn } = authResult;
 
     if (!rawUser || !userId) {
