@@ -10,6 +10,7 @@ import {
 } from "@/lib/definitions";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { startOfToday, lightFormat, isBefore, addDays } from "date-fns";
+import { z } from "zod";
 
 export const fetchUserTasks = async (userId: string, date?: string) => {
   const tasksDate = date ?? lightFormat(startOfToday(), "yyyy-MM-dd");
@@ -89,9 +90,7 @@ export const createDatabaseUser = async ({
   }
 };
 
-export const fetchCurrentStreak = async () => {
-  const { userId } = await auth();
-
+export const fetchCurrentStreak = async (userId: string) => {
   try {
     const data = await sql<{ streak_length: number }>`
       WITH completed_days AS (
@@ -141,13 +140,11 @@ export const fetchCurrentStreak = async () => {
   }
 };
 
-export const fetchUserChallengeStartDate = async () => {
+export const fetchUserChallengeStartDate = async (userId: string) => {
   // get the earliest date when all tasks were completed for a user and treat this as the start date of the challenge.
   type StartDate = {
     start_date: string;
   };
-
-  const { userId } = await auth();
 
   const data = await sql<StartDate>`
     SELECT MIN(ut.date) AS start_date
@@ -188,11 +185,13 @@ export const fetchUserLastProgress = async (userId: string) => {
   return data.rows[0]?.last_progress_date;
 };
 
-export const fetchCompletedDates = async () => {
-  const { userId } = await auth();
+export const fetchCompletedDates = async (userId: string) => {
+  type TaskDate = {
+    date: Date;
+  };
 
   try {
-    const data = await sql<{ date: string }>`
+    const data = await sql<TaskDate>`
       SELECT
         date
       FROM
@@ -208,7 +207,15 @@ export const fetchCompletedDates = async () => {
         date ASC;
     `;
 
-    return data.rows.map((row) => row.date);
+    const result = data.rows.map((row) => row.date);
+
+    const parseResult = z.array(z.date()).safeParse(result);
+    if (!parseResult.success) {
+      console.error(parseResult.error);
+      throw new Error("Failed to parse tasks data.");
+    }
+
+    return parseResult.data;
   } catch (error) {
     console.error("Error fetching completed dates:", error);
     throw new Error("Failed to fetch completed dates.");

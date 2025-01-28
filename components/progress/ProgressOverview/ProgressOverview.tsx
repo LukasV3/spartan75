@@ -4,10 +4,14 @@ import { CurrentStreak } from "@/components/progress/CurrentStreak/CurrentStreak
 import { getCurrentDayIndex } from "@/lib/utils";
 import { fetchUserChallengeStartDate } from "@/lib/data";
 
-export const ProgressOverview = async () => {
+type ProgressOverviewProps = {
+  userId: string;
+};
+
+export const ProgressOverview = async ({ userId }: ProgressOverviewProps) => {
   const [challengeStartDate, streak] = await Promise.all([
-    fetchUserChallengeStartDate(),
-    fetchCurrentStreak(),
+    fetchUserChallengeStartDate(userId),
+    fetchCurrentStreak(userId),
   ]);
   const currentDayIndex = getCurrentDayIndex(challengeStartDate);
 
@@ -30,7 +34,7 @@ export const ProgressOverview = async () => {
 
       <hr />
 
-      <StreakCalendar />
+      <StreakCalendar userId={userId} />
     </div>
   );
 };

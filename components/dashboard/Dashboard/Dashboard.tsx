@@ -13,7 +13,7 @@ type DashboardProps = {
   userId: string;
 };
 
-export async function Dashboard({ userId }: DashboardProps) {
+export const Dashboard = async ({ userId }: DashboardProps) => {
   await handleTaskCreation(userId);
 
   return (
@@ -27,10 +27,10 @@ export async function Dashboard({ userId }: DashboardProps) {
           </Suspense>
 
           <Suspense fallback={<ProgressOverviewSkeleton />}>
-            <ProgressOverview />
+            <ProgressOverview userId={userId} />
           </Suspense>
         </div>
       </div>
     </SidebarInset>
   );
-}
+};

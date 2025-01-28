@@ -9,7 +9,11 @@ import {
 import { AppLogo } from "@/components/sidebar/AppLogo/AppLogo";
 import { type User } from "@/lib/definitions";
 
-export function AppSidebar({ user }: { user: User }) {
+type AppSidebarProps = {
+  user: User;
+};
+
+export const AppSidebar = async ({ user }: AppSidebarProps) => {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -28,4 +32,4 @@ export function AppSidebar({ user }: { user: User }) {
       <SidebarRail />
     </Sidebar>
   );
-}
+};

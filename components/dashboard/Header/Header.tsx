@@ -29,7 +29,7 @@ export const Header = () => {
 
         <div className="ml-auto flex items-center md:pr-3">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="https://github.com/LukasV3" target="_blank">
+            <Link href="https://github.com/LukasV3/spartan75" target="_blank">
               <Github />
             </Link>
           </Button>
