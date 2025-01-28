@@ -1,10 +1,12 @@
 import { Calendar } from "@/components/ui/calendar";
 import { fetchCompletedDates } from "@/lib/data";
 
-const StreakCalendar = async () => {
-  const completedDates = await fetchCompletedDates();
-  // TODO: Convert dates to Date objects using zod schema validation
-  const formattedCompletedDates = completedDates.map((date) => new Date(date));
+type StreakCalendarProps = {
+  userId: string;
+};
+
+export const StreakCalendar = async ({ userId }: StreakCalendarProps) => {
+  const completedDates = await fetchCompletedDates(userId);
 
   return (
     <div className="flex flex-col space-y-2">
@@ -12,11 +14,9 @@ const StreakCalendar = async () => {
 
       <Calendar
         mode="multiple"
-        selected={formattedCompletedDates}
+        selected={completedDates}
         className="rounded-md border w-min"
       />
     </div>
   );
 };
-
-export default StreakCalendar;

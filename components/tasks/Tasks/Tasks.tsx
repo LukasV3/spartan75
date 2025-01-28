@@ -1,29 +1,29 @@
 "use client";
 
-import DateHeading from "@/components/dashboard/tasks-checklist/date-heading";
+import { DateHeading } from "@/components/tasks/DateHeading/DateHeading";
 import { fetchUserTasks } from "@/lib/data";
-import { UserTask, UserTasksSchema } from "@/lib/definitions";
-import TaskListContainer from "@/components/dashboard/tasks-checklist/task-list-container";
+import { UserTask } from "@/lib/definitions";
+import { TaskListContainer } from "@/components/tasks/TaskListContainer/TaskListContainer";
 import { startOfToday, lightFormat } from "date-fns";
 import { useEffect, useState } from "react";
 
-const Tasks = ({ userId }: { userId: string }) => {
+export const Tasks = ({ userId }: { userId: string }) => {
   const defaultDate = lightFormat(startOfToday(), "yyyy-MM-dd");
   const [date, setDate] = useState<string>(defaultDate);
   const [tasks, setTasks] = useState<UserTask[]>([]);
 
   // fetch tasks for the given user id and date
   useEffect(() => {
-    fetchUserTasks(userId, date).then((newTasks) => {
-      const parseResult = UserTasksSchema.safeParse(newTasks);
-
-      if (!parseResult.success) {
-        console.error(parseResult.error);
-        return;
+    const fetchTasks = async () => {
+      try {
+        const newTasks = await fetchUserTasks(userId, date);
+        setTasks(newTasks);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
       }
+    };
 
-      setTasks(parseResult.data);
-    });
+    fetchTasks();
   }, [userId, date]);
 
   return (
@@ -54,5 +54,3 @@ const Tasks = ({ userId }: { userId: string }) => {
     </div>
   );
 };
-
-export default Tasks;

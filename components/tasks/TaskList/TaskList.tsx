@@ -1,4 +1,4 @@
-import Task from "@/components/dashboard/tasks-checklist/task";
+import { Task } from "@/components/tasks/Task/Task";
 import { type UserTask } from "@/lib/definitions";
 
 type TaskListProps = {
@@ -7,7 +7,7 @@ type TaskListProps = {
   disabled: boolean;
 };
 
-const TaskList = ({ tasks, onTaskClick, disabled }: TaskListProps) => {
+export const TaskList = ({ tasks, onTaskClick, disabled }: TaskListProps) => {
   return (
     <ul className="flex flex-col">
       {tasks.map((task) => (
@@ -23,5 +23,3 @@ const TaskList = ({ tasks, onTaskClick, disabled }: TaskListProps) => {
     </ul>
   );
 };
-
-export default TaskList;

@@ -1,7 +1,7 @@
 "use client";
 
-import TaskList from "@/components/dashboard/tasks-checklist/task-list";
-import ProgressBar from "@/components/dashboard/tasks-checklist/progress-bar";
+import { TaskList } from "@/components/tasks/TaskList/TaskList";
+import { ProgressBar } from "@/components/tasks/ProgressBar/ProgressBar";
 import { type UserTask } from "@/lib/definitions";
 import { useOptimistic, useTransition } from "react";
 import { toggleTaskComplete } from "@/lib/actions";
@@ -15,7 +15,7 @@ type TaskListContainerProps = {
   setTasks: (tasks: UserTask[]) => void;
 };
 
-const TaskListContainer = ({
+export const TaskListContainer = ({
   tasks,
   userId,
   date,
@@ -76,5 +76,3 @@ const TaskListContainer = ({
     </>
   );
 };
-
-export default TaskListContainer;

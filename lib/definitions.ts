@@ -7,7 +7,7 @@ export const UserSchema = z.object({
   emailAddresses: z.array(
     z.object({
       emailAddress: z.string(),
-    }),
+    })
   ),
 });
 
@@ -23,20 +23,13 @@ export type User = {
   avatar: string;
 };
 
-// export const TasksSchema = z.array(
-//   z.object({
-//     id: z.number(),
-//     name: z.string(),
-//   })
-// );
-
 export const UserTasksSchema = z.array(
   z.object({
     id: z.number(),
     name: z.string(),
     date: z.coerce.string(), // stored as date YYYY-DD-MM
     completed: z.boolean(),
-  }),
+  })
 );
 
 export type Task = {

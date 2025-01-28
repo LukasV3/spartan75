@@ -1,9 +1,16 @@
 "use server";
 
 import { sql } from "@vercel/postgres";
-import { type DatabaseUser, type UserTask } from "@/lib/definitions";
-import { auth } from "@clerk/nextjs/server";
-import { startOfToday, lightFormat } from "date-fns";
+import {
+  type DatabaseUser,
+  type UserTask,
+  type User,
+  UserSchema,
+  UserTasksSchema,
+} from "@/lib/definitions";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { startOfToday, lightFormat, isBefore, addDays } from "date-fns";
+import { z } from "zod";
 
 export const fetchUserTasks = async (userId: string, date?: string) => {
   const tasksDate = date ?? lightFormat(startOfToday(), "yyyy-MM-dd");
@@ -17,7 +24,13 @@ export const fetchUserTasks = async (userId: string, date?: string) => {
       ORDER BY t.id ASC;
     `;
 
-    return data.rows;
+    const parseResult = UserTasksSchema.safeParse(data.rows);
+    if (!parseResult.success) {
+      console.error(parseResult.error);
+      throw new Error("Failed to parse tasks data.");
+    }
+
+    return parseResult.data;
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch tasks data.");
@@ -77,11 +90,13 @@ export const createDatabaseUser = async ({
   }
 };
 
-export const fetchCurrentStreak = async () => {
-  const { userId } = await auth();
+export const fetchCurrentStreak = async (userId: string) => {
+  type StreakData = {
+    streak_length: string;
+  };
 
   try {
-    const data = await sql<{ streak_length: number }>`
+    const data = await sql<StreakData>`
       WITH completed_days AS (
         SELECT
           date
@@ -122,20 +137,28 @@ export const fetchCurrentStreak = async () => {
         streak_group = (SELECT streak_group FROM current_streak_group);
     `;
 
-    return data.rows[0]?.streak_length ?? 0;
+    const parsedResult = z
+      .object({
+        streak_length: z.coerce.number(),
+      })
+      .safeParse(data.rows[0]);
+    if (!parsedResult.success) {
+      console.error(parsedResult.error);
+      throw new Error("Failed to parse streak data.");
+    }
+
+    return parsedResult.data.streak_length ?? 0;
   } catch (error) {
     console.error("Error: Could not fetch user streak:", error);
     throw new Error("Failed to fetch streak data.");
   }
 };
 
-export const fetchUserChallengeStartDate = async () => {
+export const fetchUserChallengeStartDate = async (userId: string) => {
   // get the earliest date when all tasks were completed for a user and treat this as the start date of the challenge.
   type StartDate = {
-    start_date: string;
+    start_date: Date;
   };
-
-  const { userId } = await auth();
 
   const data = await sql<StartDate>`
     SELECT MIN(ut.date) AS start_date
@@ -153,11 +176,21 @@ export const fetchUserChallengeStartDate = async () => {
       );
   `;
 
-  const result = data.rows;
-  const startDate =
-    result.length > 0 && result[0].start_date
-      ? lightFormat(new Date(result[0].start_date), "yyyy-MM-dd")
-      : null;
+  const result = data.rows[0];
+
+  const parseResult = z
+    .object({
+      start_date: z.coerce.date(),
+    })
+    .safeParse(result);
+  if (!parseResult.success) {
+    console.error(parseResult.error);
+    throw new Error("Failed to parse start date data.");
+  }
+
+  const startDate = result.start_date
+    ? lightFormat(new Date(result.start_date), "yyyy-MM-dd")
+    : null;
 
   return startDate;
 };
@@ -176,11 +209,13 @@ export const fetchUserLastProgress = async (userId: string) => {
   return data.rows[0]?.last_progress_date;
 };
 
-export const fetchCompletedDates = async () => {
-  const { userId } = await auth();
+export const fetchCompletedDates = async (userId: string) => {
+  type TaskDate = {
+    date: Date;
+  };
 
   try {
-    const data = await sql<{ date: string }>`
+    const data = await sql<TaskDate>`
       SELECT
         date
       FROM
@@ -196,9 +231,87 @@ export const fetchCompletedDates = async () => {
         date ASC;
     `;
 
-    return data.rows.map((row) => row.date);
+    const result = data.rows.map((row) => row.date);
+
+    const parseResult = z.array(z.date()).safeParse(result);
+    if (!parseResult.success) {
+      console.error(parseResult.error);
+      throw new Error("Failed to parse tasks data.");
+    }
+
+    return parseResult.data;
   } catch (error) {
     console.error("Error fetching completed dates:", error);
     throw new Error("Failed to fetch completed dates.");
+  }
+};
+
+export const fetchUserData = async (): Promise<{
+  userId: string;
+  user: User;
+} | null> => {
+  try {
+    const [rawUser, authResult] = await Promise.all([currentUser(), auth()]);
+
+    const { userId, redirectToSignIn } = authResult;
+
+    if (!rawUser || !userId) {
+      redirectToSignIn();
+      return null;
+    }
+
+    const parseResult = UserSchema.safeParse(rawUser);
+    if (!parseResult.success) {
+      console.error(parseResult.error);
+      return null; // TODO: Handle error
+    }
+
+    const {
+      username,
+      emailAddresses: [{ emailAddress }],
+      imageUrl,
+    } = parseResult.data;
+
+    const user = {
+      username,
+      email: emailAddress,
+      avatar: imageUrl,
+    };
+
+    return { userId, user };
+  } catch (error) {
+    console.error("Failed to fetch user data:", error);
+    return null;
+  }
+};
+
+export const handleTaskCreation = async (userId: string) => {
+  try {
+    const lastProgressDate = await fetchUserLastProgress(userId);
+    const today = startOfToday();
+
+    if (!lastProgressDate) {
+      // Create today's tasks for a new user
+      await createUserTasks(userId);
+    } else if (isBefore(lastProgressDate, today)) {
+      // Handle missing days
+      let currentDay = addDays(lastProgressDate, 1);
+      const missingDays = [];
+
+      while (isBefore(currentDay, today)) {
+        missingDays.push(currentDay);
+        currentDay = addDays(currentDay, 1);
+      }
+      missingDays.push(today);
+
+      const formattedDays = missingDays.map((day) =>
+        lightFormat(day, "yyyy-MM-dd")
+      );
+
+      // Create tasks for missing days and today
+      await createUserTasks(userId, formattedDays);
+    }
+  } catch (error) {
+    console.error("Failed to create tasks:", error);
   }
 };

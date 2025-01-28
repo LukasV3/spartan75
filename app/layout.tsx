@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html
+        lang="en"
+        suppressHydrationWarning // needed to avoid the hydration warning caused by next/themes - https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
+      >
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
