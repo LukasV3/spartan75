@@ -29,7 +29,7 @@ export const TaskListContainer = ({
     return tasks.map((task) =>
       task.id === toggledTask.id
         ? { ...task, completed: toggledTask.completed }
-        : task
+        : task,
     );
   });
   const optimisticPercentComplete =

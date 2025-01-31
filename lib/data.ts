@@ -305,7 +305,7 @@ export const handleTaskCreation = async (userId: string) => {
       missingDays.push(today);
 
       const formattedDays = missingDays.map((day) =>
-        lightFormat(day, "yyyy-MM-dd")
+        lightFormat(day, "yyyy-MM-dd"),
       );
 
       // Create tasks for missing days and today
